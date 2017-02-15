@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/anime_book_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- 顶部背景 -->
+    <include layout="@layout/nav_top_view"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 漫画介绍 -->
+        <include layout="@layout/nav_book_nome"/>
+
+        <!-- 漫画章节 -->
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+            android:id="@+id/recView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="10dp"
+            app:fastScrollPopupBgColor="@color/colorAccent"
+            app:fastScrollThumbColor="@color/colorAccent"
+            app:fastScrollAutoHide="true"
+            app:fastScrollAutoHideDelay="500"
+            app:fastScrollTrackColor="#00000000"/>
+
+    </LinearLayout>
+
+    <!-- 加载界面 -->
+    <TextView
+        android:id="@+id/now_read2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/anime_book_home_read"
+        android:alpha="0.5"/>
+
+    <!-- Fab按钮组 -->
+    <seiko.neiko.widget.fab.FloatingActionMenu
+        android:id="@+id/fab_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="16dp"
+        app:menu_colorNormal="@color/green_BEST"
+        app:menu_colorPressed="@color/green_BEST"
+        app:menu_colorRipple="@color/white"
+        app:menu_fab_hide_animation="@anim/hide_to_bottom"
+        app:menu_fab_show_animation="@anim/show_from_bottom"
+        app:menu_fab_label="长按跳转"
+        app:menu_labels_ellipsize="end"
+        app:menu_labels_singleLine="true">
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_download"
+            app:fab_colorNormal="@color/red"
+            app:fab_label="下载"
+            app:fab_size="mini"/>
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_refresh"
+            app:fab_colorNormal="@color/purple_A400"
+            app:fab_label="刷新"
+            app:fab_size="mini"/>
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_favor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_star"
+            app:fab_colorNormal="@color/yellow"
+            app:fab_label="收藏"
+            app:fab_size="mini"/>
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_setting"
+            app:fab_colorNormal="@color/blue"
+            app:fab_label="设置"
+            app:fab_size="mini"/>
+
+    </seiko.neiko.widget.fab.FloatingActionMenu>
+
+</android.support.design.widget.CoordinatorLayout>

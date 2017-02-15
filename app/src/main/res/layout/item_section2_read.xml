@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/section_linear"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/section2_read_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <seiko.neiko.widget.ScaleImageView
+        android:id="@+id/section_views"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/section2_read_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <Button
+            style="@style/Base.TextAppearance.AppCompat.Button"
+            android:id="@+id/section2_load_prev"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="@string/section2_load_prev"/>
+
+        <Button
+            style="@style/Base.TextAppearance.AppCompat.Button"
+            android:id="@+id/section2_load_next"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="@string/section2_load_next"/>
+
+    </LinearLayout>
+
+</LinearLayout>

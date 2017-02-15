@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- 顶部背景 -->
+    <include layout="@layout/nav_top_view"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 顶部card -->
+        <include layout="@layout/nav_top_tab"/>
+
+        <!--目录(book)-->
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="3dp"
+                    android:text="目录"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPrimary"/>
+
+                <LinearLayout
+                    android:id="@+id/book_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="6dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/book_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.74"
+                        android:text="00MB"/>
+
+                    <TextView
+                        android:id="@+id/book_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.54"
+                        android:text="清空"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!--首页(home)-->
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="3dp"
+                    android:text="首页"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPrimary"/>
+
+                <LinearLayout
+                    android:id="@+id/home_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="6dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/home_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.74"
+                        android:text="00MB"/>
+
+                    <TextView
+                        android:id="@+id/home_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.54"
+                        android:text="清空"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!--图片(img)-->
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="3dp"
+                    android:text="图片"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPrimary"/>
+
+                <LinearLayout
+                    android:id="@+id/img_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="6dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/img_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.74"
+                        android:text="00MB"/>
+
+                    <TextView
+                        android:id="@+id/img_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:alpha="0.54"
+                        android:text="清空"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

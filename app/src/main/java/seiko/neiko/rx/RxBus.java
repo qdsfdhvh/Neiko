@@ -1,0 +1,46 @@
+package seiko.neiko.rx;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
+
+/**
+ * RxBus
+ * Created by YoKeyword on 2015/6/17.
+ */
+
+public class RxBus {
+
+    private static RxBus instance;
+
+    private final Subject<Object, Object> bus;
+
+    // PublishSubject只会把在订阅发生的时间点之后来自原始Observable的数据发射给观察者
+    public RxBus() {bus = new SerializedSubject<>(PublishSubject.create());}
+
+    // 单例RxBus
+    public static RxBus getDefault() {
+        if (instance == null) {
+            synchronized (RxBus.class) {
+                if (instance == null) {
+                    instance = new RxBus();
+                }
+            }
+        }
+        return instance;
+    }
+
+    // 发送一个新的事件
+    public void post(RxEvent event) {bus.onNext(event);}
+
+
+    // 根据传递的 eventType 类型返回特定类型(eventType)的 被观察者
+    public Observable<RxEvent> toObservable(final int type) {
+        return bus.ofType(RxEvent.class)
+                .filter((x) -> x.getType() == type)
+                .onBackpressureBuffer()
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+}

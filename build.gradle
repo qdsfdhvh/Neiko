@@ -1,0 +1,29 @@
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        //替换成最新的 gradle版本
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        //用于：BindView
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.5.1'
+        //用于：java1.8
+        classpath 'me.tatarka:gradle-retrolambda:3.2.0'
+        //用于：快速打包
+        classpath 'com.mcxiaoke.gradle:packer-ng:1.0.8'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

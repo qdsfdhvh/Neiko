@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:text="@string/section2_set_textsize" />
+
+        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+            android:id="@+id/textSize"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+    <!-- 进度条 -->
+    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- 设置 暂时 -->
+    <android.support.v7.widget.CardView
+        android:id="@+id/change_setting"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="6dp"
+        android:layout_gravity="center_horizontal"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/green_BEST"
+        app:cardCornerRadius="10dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_settings2"
+            android:contentDescription="@string/app_name"/>
+
+    </android.support.v7.widget.CardView>
+</merge>

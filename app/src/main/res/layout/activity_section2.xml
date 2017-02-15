@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 小说列表 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- 返回按钮 -->
+    <include layout="@layout/control_back"/>
+
+    <!-- 小说标题 -->
+    <include layout="@layout/control_section_title"/>
+
+    <!-- 控制界面 -->
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/control"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="bottom|center"
+        android:background="@drawable/section1_bg"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <include layout="@layout/control_section_set2"/>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

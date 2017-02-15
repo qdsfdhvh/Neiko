@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="SiteD引擎：30">
+        <Preference
+            android:summary="点击访问插件中心"
+            android:title="插件中心">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://sited.noear.org/"/>
+        </Preference>
+
+        <Preference
+            android:summary="点击访问独立插件"
+            android:title="独立插件">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://sited.ka94.com/"/>
+        </Preference>
+
+        <Preference
+            android:summary="点击访问Guang插件"
+            android:title="Guang插件">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://guang.ka94.com/sited.html" />
+        </Preference>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="作者">
+        <Preference
+            android:summary="点击捐赠[支付宝:605590140@qq.com]"
+            android:title="Seiko">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://qr.alipay.com/aex05069p7bqjewpqaoizaa" />
+        </Preference>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="声明">
+        <Preference
+            android:summary="软件仅用作个人学习使用"
+            android:title="仅供测试" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 进度条 -->
+    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- 横竖 -->
+    <android.support.v7.widget.CardView
+        android:id="@+id/change_Orientation"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="6dp"
+        android:layout_gravity="center_horizontal"
+        android:foreground="?attr/selectableItemBackground"
+
+        app:cardBackgroundColor="@color/green_BEST"
+        app:cardCornerRadius="10dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_orientation"
+            android:contentDescription="@string/app_name"/>
+
+    </android.support.v7.widget.CardView>
+
+</merge>

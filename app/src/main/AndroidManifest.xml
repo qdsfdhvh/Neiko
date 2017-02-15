@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="seiko.neiko">
+
+    <!-- 网络 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- 读写权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <application
+        android:name=".app.App"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        tools:replace="android:allowBackup"
+        android:supportsRtl="true"
+        android:fullBackupContent="true"
+        android:theme="@style/AppTheme.Splash">
+
+        <meta-data
+            android:name="seiko.neiko.dao.CustomModule"
+            android:value="GlideModule"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.main.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="sited"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.sited" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:host="*" />
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.sited" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.home.AnimeHomeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.book.AnimeBookActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.section1.Section1Activity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.section2.Section2Activity"/>
+
+        <activity
+            android:hardwareAccelerated="true"
+            android:name=".ui.section3.AnimeSection3Activity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.search.SearchActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.tag.TagActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.down.Download1Activity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.down.Download2Activity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.sited.SitedActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.CopyAcitivty"/>
+
+        <activity
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:name=".ui.CacheActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:name=".ui.AboutActivity"/>
+
+        <service android:name=".service.DownloadService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

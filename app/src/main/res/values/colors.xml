@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="green_BEST">#1abc9c</color>
+
+    <color name="white">@android:color/white</color>
+    <color name="black">@android:color/black</color>
+    <color name="red">#F44336</color>
+    <color name="grey">#9E9E9E</color>
+    <color name="yellow">#ffeb3b</color>
+    <color name="blue">#5677fc</color>
+    <color name="translucent_white">#80FFFFFF</color>
+    <color name="translucent_black">#80000000</color>
+    <color name="translucent_white_8p">#14FFFFFF</color>
+    <color name="translucent_white_24p">#3DFFFFFF</color>
+    <!--play bar-->
+
+
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00695C</color>
+    <color name="colorAccent">#009688</color>
+    <color name="textColorPrimary">#212121</color>
+    <color name="textColorSecondary">#727272</color>
+    
+    <color name="purple_A400">#d500f9</color>
+    <color name="purple">#ff2d6f</color>
+
+
+    <color name="purple_300">#BA68C8</color>
+    <color name="pink_500">#E91E63</color>
+    <color name="indigo_500">#3F51B5</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="teal_500">#009688</color>
+
+
+
+    <color name="light_blue_500">#03a9f4</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="brown_500">#795548</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="deep_purple_500">#673AB7</color>
+
+</resources>

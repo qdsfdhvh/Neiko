@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Neiko</string>
+    <string name="cube_ptr_pull_down">下拉</string>
+    <string name="cube_ptr_pull_down_to_refresh">下拉刷新</string>
+    <string name="cube_ptr_release_to_refresh">释放刷新</string>
+    <string name="cube_ptr_refreshing">加载中(…, &#8230;)</string>
+    <string name="cube_ptr_refresh_complete">更新完成.</string>
+    
+    <string name="cube_ptr_last_update">上次更新:&#160;</string>
+    <string name="cube_ptr_seconds_ago">&#160;秒之前</string>
+    <string name="cube_ptr_minutes_ago">&#160;分钟之前</string>
+    <string name="cube_ptr_hours_ago">&#160;小时之前</string>
+
+    <string name="anime_book_home_read">正在加载</string>
+    <string name="anime_web_tag_title">分类</string>
+
+    <string name="nav_home">首页</string>
+    <string name="nav_grade">收藏</string>
+    <string name="nav_get_app">下载</string>
+    <string name="nav_history">历史</string>
+    <string name="nav_settings">设置</string>
+    <string name="section2_load_prev">上一章</string>
+    <string name="section2_load_next">下一章</string>
+    <string name="nav_copy">备份</string>
+    <string name="read_mode">阅读模式：</string>
+    <string name="cut_pic">图片切割：</string>
+    <string name="load_prev">反向加载：</string>
+
+    <string name="download_service_doing">正在下载漫画</string>
+    <string name="nav_exit">退出</string>
+    <string name="nav_cache">缓存</string>
+    <string name="nav_about">关于</string>
+    <string name="section2_set_textsize">字体大小</string>
+    <string name="nav_sited">插件</string>
+</resources>

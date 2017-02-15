@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_home"-->
+            <!--android:icon="@drawable/ic_home_black_24dp"-->
+            <!--android:title="@string/nav_home"-->
+            <!--android:checked="true"/>-->
+        <!--<item-->
+            <!--android:id="@+id/nav_grade"-->
+            <!--android:icon="@drawable/ic_star_white"-->
+            <!--android:title="@string/nav_grade" />-->
+        <!--<item-->
+            <!--android:id="@+id/nav_get_app"-->
+            <!--android:icon="@drawable/selector_download"-->
+            <!--android:title="@string/nav_get_app" />-->
+        <!--<item-->
+            <!--android:id="@+id/nav_history"-->
+            <!--android:icon="@drawable/ic_history_black_24dp"-->
+            <!--android:title="@string/nav_history" />-->
+
+    <!--</group>-->
+
+    <item
+        android:id="@+id/nav_download"
+        android:icon="@drawable/selector_download"
+        android:title="@string/nav_get_app" />
+
+    <!--<item-->
+        <!--android:id="@+id/nav_copy"-->
+        <!--android:icon="@drawable/selector_copy"-->
+        <!--android:title="@string/nav_copy" />-->
+
+    <item
+        android:id="@+id/nav_sited"
+        android:icon="@drawable/selector_sited"
+        android:title="@string/nav_sited" />
+
+    <item
+        android:id="@+id/nav_cache"
+        android:icon="@drawable/selector_cache"
+        android:title="@string/nav_cache" />
+
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/selector_about"
+        android:title="@string/nav_about" />
+
+    <group android:id="@+id/group_other1">
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/selector_exit"
+            android:title="@string/nav_exit" />
+    </group>
+
+</menu>

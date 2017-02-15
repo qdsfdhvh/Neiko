@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.down.Download1Activity">
+
+    <!-- 顶部背景 -->
+    <include layout="@layout/nav_top_view"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 顶部card -->
+        <include layout="@layout/nav_top_tab"/>
+
+        <!-- 下载漫画列表 -->
+        <zlc.season.practicalrecyclerview.PracticalRecyclerView
+            android:id="@+id/recView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <!-- Fab按钮组 -->
+    <seiko.neiko.widget.fab.FloatingActionMenu
+        android:id="@+id/fab_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="16dp"
+        app:menu_colorNormal="@color/green_BEST"
+        app:menu_colorPressed="@color/green_BEST"
+        app:menu_colorRipple="@color/white"
+        app:menu_fab_hide_animation="@anim/hide_to_bottom"
+        app:menu_fab_show_animation="@anim/show_from_bottom"
+        app:menu_fab_label="操作"
+        app:menu_labels_ellipsize="end"
+        app:menu_labels_singleLine="true">
+
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_delete"
+            app:fab_colorNormal="@color/yellow"
+            app:fab_label="删除"
+            app:fab_size="mini"/>
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_setting"
+            app:fab_colorNormal="@color/blue"
+            app:fab_label="设置"
+            app:fab_size="mini"/>
+
+    </seiko.neiko.widget.fab.FloatingActionMenu>
+
+
+</android.support.design.widget.CoordinatorLayout>

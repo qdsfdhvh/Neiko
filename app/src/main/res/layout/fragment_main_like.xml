@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <zlc.season.practicalrecyclerview.PracticalRecyclerView
+        android:id="@+id/recView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="2dp"/>
+
+    <seiko.neiko.widget.fab.FloatingActionMenu
+        android:id="@id/fab_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="16dp"
+        app:menu_colorNormal="@color/green_BEST"
+        app:menu_colorPressed="@color/green_BEST"
+        app:menu_colorRipple="@color/white"
+        app:menu_fab_hide_animation="@anim/hide_to_bottom"
+        app:menu_fab_show_animation="@anim/show_from_bottom"
+        app:menu_labels_ellipsize="end"
+        app:menu_labels_singleLine="true">
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_refresh"
+            app:fab_colorNormal="@color/red"
+            app:fab_label="探测"
+            app:fab_size="mini"/>
+
+        <seiko.neiko.widget.fab.FloatingActionButton
+            android:id="@+id/fab_copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/selector_copy"
+            app:fab_colorNormal="@color/blue"
+            app:fab_label="备份"
+            app:fab_size="mini"/>
+
+    </seiko.neiko.widget.fab.FloatingActionMenu>
+
+</FrameLayout>
