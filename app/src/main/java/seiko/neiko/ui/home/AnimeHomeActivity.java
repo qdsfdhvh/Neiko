@@ -108,19 +108,9 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
         refresh = ButterKnife.findById(hot, R.id.refresh);
 
         adapter_hot = new HomeHotAdapter(source, m.url);
-        final StaggeredGridLayoutManager sgm = new StaggeredGridLayoutManager(HOTS_NUMBER, OrientationHelper.VERTICAL);
-//        sgm.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-        recView_hot.setLayoutManager(sgm);
+        recView_hot.setLayoutManager(new StaggeredGridLayoutManager(HOTS_NUMBER, OrientationHelper.VERTICAL));
         recView_hot.setHasFixedSize(true);
         recView_hot.setAdapterWithLoading(adapter_hot);
-//        recView_hot.setItemAnimator(null);
-//        recView_hot.get().addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                sgm.invalidateSpanAssignments();
-//            }
-//        });
     }
 
     //分类

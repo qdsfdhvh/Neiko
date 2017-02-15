@@ -108,9 +108,6 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
             case R.id.nav_download:
                 openActivity(Download1Activity.class);
                 return true;
-//            case R.id.nav_copy:
-//                openActivity(CopyAcitivty.class);
-//                return true;
             case R.id.nav_sited:
                 openActivity(SitedActivity.class);
                 return true;

@@ -123,11 +123,6 @@
             android:name=".ui.sited.SitedActivity"/>
 
         <activity
-            android:screenOrientation="portrait"
-            android:hardwareAccelerated="true"
-            android:name=".ui.CopyAcitivty"/>
-
-        <activity
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:name=".ui.CacheActivity"/>
