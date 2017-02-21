@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lid.lib.LabelImageView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -16,9 +14,10 @@ import butterknife.OnLongClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.dao.db.DbApi;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
 import seiko.neiko.utils.HintUtil;
+import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
 import static seiko.neiko.dao.engine.DdApi.setLabelText;
@@ -30,7 +29,7 @@ import static seiko.neiko.dao.engine.DdApi.setLabelText;
 class MainHistViewHolder extends AbstractViewHolder<Book> {
 
     @BindView(R.id.logo)
-    LabelImageView iv;
+    ScaleImageView iv;
     @BindView(R.id.title)
     TextView tv;
 

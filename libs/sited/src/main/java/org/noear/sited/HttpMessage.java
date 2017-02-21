@@ -2,7 +2,6 @@ package org.noear.sited;
 
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Switch;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,12 +30,6 @@ public class HttpMessage {
     HttpMessage() {
     }
 
-    HttpMessage(SdNode cfg, String url) {
-        this.config = cfg;
-        this.url = url;
-        rebuild(null);
-    }
-
     HttpMessage(SdNode cfg, String url, int tag, Map<String, String> args) {
         this.config = cfg;
         this.url = url;
@@ -45,6 +38,11 @@ public class HttpMessage {
         rebuild(null);
     }
 
+    HttpMessage(SdNode cfg, String url) {
+        this.config = cfg;
+        this.url = url;
+        rebuild(null);
+    }
 
     void rebuild(SdNode cfg) {
         if (cfg != null) {
@@ -92,7 +90,7 @@ public class HttpMessage {
                 } else {
                     _strArgs = config.getArgs(url, page+"");
                 }
-            }else{
+            } else {
                 _strArgs = config.getArgs(url, Util.toJson(data));
             }
 

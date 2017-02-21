@@ -4,9 +4,6 @@ import android.view.ViewGroup;
 
 import java.util.Collections;
 
-import seiko.neiko.dao.db.SiteDbApi;
-import seiko.neiko.dao.engine.DdSource;
-import seiko.neiko.models.Book;
 import seiko.neiko.models.SourceModel;
 import seiko.neiko.widget.helper.ItemTouchHelperAdapter;
 import zlc.season.practicalrecyclerview.AbstractAdapter;
@@ -25,17 +22,6 @@ class MainSiteDAdapter extends AbstractAdapter<SourceModel, MainSiteDViewHolder>
     @Override
     protected void onNewBindViewHolder(MainSiteDViewHolder holder, int position) {
         holder.setData(get(position));
-    }
-
-    //======================================
-    /** 添加sited */
-    void addSiteD(SourceModel m) {
-        //判断是否已经包含
-        for (SourceModel m1:getData()) {
-            if (m1.title.contains(m.title))
-                return;
-        }
-        add(m);
     }
 
     //======================================

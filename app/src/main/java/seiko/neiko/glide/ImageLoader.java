@@ -1,35 +1,23 @@
-package seiko.neiko.dao;
+package seiko.neiko.glide;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.DrawableTypeRequest;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.BaseTarget;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import seiko.neiko.R;
-import seiko.neiko.app.App;
 import seiko.neiko.dao.db.DbApi;
-import seiko.neiko.models.SizeModel;
 import seiko.neiko.utils.ColorUtil;
 import seiko.neiko.widget.ScaleImageView;
 import seiko.neiko.widget.TextDrawable;

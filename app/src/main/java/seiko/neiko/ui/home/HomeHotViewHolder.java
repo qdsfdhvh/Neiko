@@ -4,19 +4,15 @@ import android.content.Context;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lid.lib.LabelImageView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
 import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
-
-import static seiko.neiko.dao.engine.DdApi.setLabelText;
 
 /**
  * Created by Seiko on 2016/12/20. Y

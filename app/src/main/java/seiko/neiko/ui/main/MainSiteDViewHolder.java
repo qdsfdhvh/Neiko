@@ -14,11 +14,8 @@ import com.jakewharton.rxbinding.view.RxView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import rx.functions.Action1;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
-import seiko.neiko.dao.db.SiteDbApi;
 import seiko.neiko.dao.mPath;
 import seiko.neiko.models.SourceModel;
 import seiko.neiko.utils.ColorUtil;

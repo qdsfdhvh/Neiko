@@ -16,7 +16,15 @@ class JsEngine {
     private V8 engine = null;
     private SdSource source = null;
 
-    JsEngine(Application app, SdSource sd) {
+    protected synchronized void release() {
+        if (engine != null) {
+            engine.getLocker().release();
+            engine = null;
+            source = null;
+        }
+    }
+
+    protected JsEngine(Application app, SdSource sd) {
         this.source = sd;
         this.engine = V8.createV8Runtime(null, app.getApplicationInfo().dataDir);
 
@@ -28,9 +36,9 @@ class JsEngine {
                     Util.log(source, "JsEngine.print", (String) arg1);
 
 
-//                    if (arg1 instanceof Releasable) {
-//                        ((Releasable) arg1).release();
-//                    }
+                    if (arg1 instanceof Releasable) {
+                        ((Releasable) arg1).release();
+                    }
                 }
             }
         };
@@ -47,8 +55,7 @@ class JsEngine {
         v8Ext.release();
     }
 
-
-    JsEngine loadJs(String funs) {
+    public synchronized JsEngine loadJs(String funs) {
 
         try {
             engine.executeVoidScript(funs);//预加载了批函数
@@ -62,13 +69,14 @@ class JsEngine {
     }
 
     //调用函数;可能传参数
-    String callJs(String fun, String... args) {
-        V8Array params = new V8Array(engine);
-        for (String p : args) {
-            params.push(p);
-        }
-
+    public synchronized String callJs(String fun, String... args) {
         try {
+            V8Array params = new V8Array(engine);
+
+            for (String p : args) {
+                params.push(p);
+            }
+
             return engine.executeStringFunction(fun, params);
         } catch (Exception ex) {
             ex.printStackTrace();

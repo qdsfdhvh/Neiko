@@ -34,7 +34,6 @@ public class TagActivity extends SwipeLayoutBase {
     private TagViewModel viewModel;
     private TagAdapter adapter;
 
-
     @Override
     public int getLayoutId() {return R.layout.activity_tag;}
 
@@ -44,7 +43,7 @@ public class TagActivity extends SwipeLayoutBase {
         viewModel = new TagViewModel();
         mTitle.setText(m.tagName);
         setRecView();
-        DoLoadViewModel();
+        DoLoadViewModel(false);
     }
 
     /** 加载列表 */
@@ -58,7 +57,7 @@ public class TagActivity extends SwipeLayoutBase {
         recView.get().addOnScrollListener(fastScroller.getOnScrollListener());
         recView.setLoadMoreListener(() -> {
             viewModel.currentPage += 1;
-            DoLoadViewModel();
+            DoLoadViewModel(true);
         });
     }
 
@@ -70,14 +69,18 @@ public class TagActivity extends SwipeLayoutBase {
         adapter.notifyDataSetChanged();
         adapter.showLoading();
 
-        DoLoadViewModel();
+        DoLoadViewModel(false);
     }
 
-    private void DoLoadViewModel() {
+    private void DoLoadViewModel(boolean isAdd) {
         source.getNodeViewModel(viewModel, false, viewModel.currentPage, m.tagUrl, source.tag(m.tagUrl), (code) -> {
             if (code == 1) {
                 mTitle.setText(m.tagName + " " + viewModel.currentPage + "页");
-                adapter.addAll(viewModel.mDatas);
+                if (isAdd) {
+                    adapter.insertAllBack(adapter.getDataSize() - 1, viewModel.mDatas);
+                }else {
+                    adapter.addAll(viewModel.mDatas);
+                }
             } else {
                 toast("加载失败");
             }

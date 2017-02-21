@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -23,13 +24,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import okhttp.OkCallback;
+import okhttp.OkHttpProxy;
+import okhttp.OkTextParser;
 import seiko.neiko.R;
 import seiko.neiko.dao.SourceApi;
-import seiko.neiko.dao.db.SiteDbApi;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.dao.mPath;
-import seiko.neiko.rx.RxBus;
-import seiko.neiko.rx.RxEvent;
+import seiko.neiko.models.SourceModel;
 import seiko.neiko.ui.CacheActivity;
 import seiko.neiko.app.ActivityBase;
 import seiko.neiko.ui.sited.SitedActivity;
@@ -38,8 +40,6 @@ import seiko.neiko.ui.AboutActivity;
 import seiko.neiko.ui.down.Download1Activity;
 import seiko.neiko.utils.Base64Util;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.utils.HintUtil;
-import seiko.neiko.utils.HttpUtil;
 
 /**
  * Created by Seiko on 2016/11/9. YiKu
@@ -59,6 +59,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     /** 页面集合 */
     private List<Fragment> fragmentList;
     private boolean flag = false;
+    private MainSiteDFragment mainsiteDFragment;
 
     @Override
     public int getLayoutId() {return R.layout.activity_main;}
@@ -67,12 +68,13 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentList = new ArrayList<>();
-        fragmentList.add(new MainSiteDFragment());
+        mainsiteDFragment = new MainSiteDFragment();
+        fragmentList.add(mainsiteDFragment);
         fragmentList.add(new MainLikeFragment());
         fragmentList.add(new MainHistFragment());
 
         mviewpager.setAdapter(new MyFragStatePagerAdapter(getSupportFragmentManager()));
-        mviewpager.setCurrentItem(1);
+//        mviewpager.setCurrentItem(1);
         mviewpager.setOffscreenPageLimit(3);
         mtabLayout.setupWithViewPager(mviewpager);
 
@@ -92,7 +94,10 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
         mNav.setNavigationItemSelectedListener(this);
 
         if (forIntent(getIntent())) {
-            mviewpager.setCurrentItem(0);
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                bundle.clear();
+            }
         }
     }
 
@@ -188,7 +193,15 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
             String webUrl = Base64Util.decode(uri.getQuery()).replace("sited://", "http://");
             if(!webUrl.contains(".sited")) return false;
 
-            HttpUtil.get(webUrl, (code, text) -> addSource(text));
+            OkHttpProxy.get().url(webUrl).enqueue(new OkCallback<String>(new OkTextParser()) {
+                @Override
+                public void onSuccess(String cookie, String s) {
+                    addSource(s);
+                }
+
+                @Override
+                public void onFailure(Throwable e) {}
+            });
             return true;
         }
 
@@ -197,7 +210,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
             try {
                 ContentResolver cr = this.getContentResolver();
                 String sited = FileUtil.toString(cr.openInputStream(uri));
-                addSource(sited);
+                new Handler().postDelayed(() -> addSource(sited), 500);  //读取太快，需要延迟处理
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -215,16 +228,17 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
             String path = mPath.getSitedPath(sd.title);
             if (!TextUtils.isEmpty(path)) {
                 File file = new File(path);
-                if (file.isDirectory()) {
-                    HintUtil.show(sd.title + "：已更新");
-                } else {
-                    HintUtil.show(sd.title + "：已安装");
-                }
+                if (file.exists())
+                    toast(sd.title + "：已更新");
+                else
+                    toast(sd.title + "：已安装");
             }
-            RxBus.getDefault().post(new RxEvent(RxEvent.EVENT_MAIN_SITED, sd.title, sd.url));
+
+            SourceModel m = new SourceModel();
+            m.title = sd.title;
+            m.url = sd.url;
+            mainsiteDFragment.addSiteD(m);
             FileUtil.saveText2Sdcard(mPath.getSitedPath(sd.title), s);
-//            SiteDbApi.addSource(sd, sd.sited, true);
         }
     }
-
 }

@@ -88,7 +88,7 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
 
                 refresh.setRefreshing(false);
             } else {
-                toast("网页链接错误");
+                adapter_hot.loadMoreFailed();
             }
         });
     }
@@ -148,9 +148,7 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
         public int getCount() {return views!=null ? views.size():0;}
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
+        public boolean isViewFromObject(View view, Object object) {return view == object;}
 
         //每次滑动的时候生成的组件
         @Override

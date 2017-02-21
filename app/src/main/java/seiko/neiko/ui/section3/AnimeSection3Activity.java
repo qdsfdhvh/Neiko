@@ -15,29 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import seiko.neiko.R;
-import seiko.neiko.models.MediaModel;
+import seiko.neiko.dao.engine.DdNode;
 import seiko.neiko.app.ActivityBase;
+import seiko.neiko.dao.mIntent;
 import seiko.neiko.viewModels.VideoViewModel;
 
 /**
  * Created by Seiko on 2016/9/7. YiKu
  */
+
 public class AnimeSection3Activity extends ActivityBase {
 
     public static Section3Model m;
-
-    private VideoViewModel viewModel;
-    private SdNode config;
-    private List<VideoijkBean> list;
-
-    public AnimeSection3Activity() {
-        viewModel = new VideoViewModel();
-        list = new ArrayList<>();
-        if (m.dtype==7)
-            config = source.book(m.url);
-        else
-            config = source.section(m.url);
-    }
 
     @Override
     protected void onResume() {
@@ -51,43 +40,44 @@ public class AnimeSection3Activity extends ActivityBase {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        VideoViewModel viewModel = new VideoViewModel();
+        SdNode config;
+        if (m.dtype==7)
+            config = source.book(m.url);
+        else
+            config = source.section(m.url);
 
         source.getNodeViewModel(viewModel, false, m.url, config, (code) -> {
             if (code == 1) {
-                if (viewModel.items == null || viewModel.items.size() == 0) {
+                if (viewModel.list == null || viewModel.list.size() == 0) {
                     isNull();
                     return;
                 }
 
                 //多个播放链接
-                if (viewModel.items.size() > 1) {
-                    int i = 1;
-                    for (MediaModel model:viewModel.items) {
-                        VideoijkBean m = new VideoijkBean();
-                        m.setStream("第"+ i +"段");
-                        m.setUrl(model.url);
-                        list.add(m);
-                        i++;
-                    }
-                    openVideo();
+                if (viewModel.list.size() > 1) {
+                    openVideo(viewModel.list);
                     return;
                 }
 
-                MediaModel model = viewModel.items.get(0);
+                VideoijkBean model = viewModel.list.get(0);
 
                 //非多链接时，判断是音乐还是视频
-                if (TextUtils.isEmpty(model.mime)) {
-                    isVideo(model.url);
+                if (TextUtils.isEmpty(model.getMime())) {
+                    isVideo(model);
                     return;
                 }
 
-                switch (model.mime) {
+                switch (model.getMime()) {
                     case "audio/x-mpeg":
-                        isMusic(model.url);
+                        if (!TextUtils.isEmpty(viewModel.logo)) {
+                            m.logo = viewModel.logo;
+                        }
+                        isMusic(model);
                         break;
                     case "video/mp4":
                     default:
-                        isVideo(model.url);
+                        isVideo(model);
                         break;
                 }
 
@@ -116,13 +106,10 @@ public class AnimeSection3Activity extends ActivityBase {
 
     //===================================================
     /** 音乐处理 */
-    private void isMusic(final String url) {
-        if (!TextUtils.isEmpty(viewModel.logo)) {
-            m.logo = viewModel.logo;
-        }
+    private void isMusic(final VideoijkBean model) {
         Section3MusicFragment section3MusicFragment = new Section3MusicFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("url", url);
+        bundle.putString("url", model.getUrl());
         bundle.putString("title", m.url);
         bundle.putString("logo", m.logo);
         section3MusicFragment.setArguments(bundle);
@@ -131,27 +118,31 @@ public class AnimeSection3Activity extends ActivityBase {
 
     //===================================================
     /** 视频处理 */
-    private void isVideo(final String url) {
+    private void isVideo(final VideoijkBean model) {
         new AlertDialog.Builder(this)
                 .setMessage("选择播放器")
                 .setNegativeButton("外部", (DialogInterface dif, int j) -> {
-                    Uri uri = Uri.parse(url);
-                    Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/*");
-                    startActivity(intent);
+                    mIntent.Intent_MX(this, model.getUrl());
                     finish();
                 })      //通知中间按钮
-                .setPositiveButton("本地", (DialogInterface dif, int j) -> {
-                    VideoijkBean m = new VideoijkBean();
-                    m.setStream("第1段");
-                    m.setUrl(url);
-                    list.add(m);
-                    openVideo();
+                .setPositiveButton("本地", (DialogInterface dif, int which) -> {
+                    DdNode objCfg = source.objectSlf(model.getUrl());
+                    if(!objCfg.isEmpty()) {
+                        model.setHeaders(objCfg.getFullHeader(model.getUrl()));
+                    }
+                    openVideo(model);
                 })  //通知最右按钮
                 .create()
                 .show();
     }
 
-    private void openVideo() {
+    private void openVideo(VideoijkBean bean) {
+        List<VideoijkBean> list = new ArrayList<>(0);
+        list.add(bean);
+        openVideo(list);
+    }
+
+    private void openVideo(List<VideoijkBean> list) {
         Section3VideoFragment.title = m.name;
         Section3VideoFragment.list  = list;
         shiftView(new Section3VideoFragment());

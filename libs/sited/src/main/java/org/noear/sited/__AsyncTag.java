@@ -1,7 +1,5 @@
 package org.noear.sited;
 
-//import me.noear.exts.Act0;
-
 /**
  * Created by yuety on 15/8/4. Y
  */

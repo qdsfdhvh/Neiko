@@ -17,7 +17,7 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 import butterknife.BindView;
 import butterknife.OnClick;
 import seiko.neiko.R;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.dao.mTouch;
 import seiko.neiko.models.ViewSetModel;

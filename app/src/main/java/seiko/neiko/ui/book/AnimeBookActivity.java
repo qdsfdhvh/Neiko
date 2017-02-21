@@ -21,7 +21,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import butterknife.BindView;
 import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.SourceApi;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.dao.mNum;
 import seiko.neiko.models.BookInfBean;
 import seiko.neiko.rx.RxBus;

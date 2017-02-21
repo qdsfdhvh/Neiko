@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,18 +20,18 @@ import android.widget.Toast;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
+//import rx.functions.Action1;
+//import io.reactivex.functions.Action;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+//import rx.subscriptions.CompositeSubscription;
+import io.reactivex.disposables.CompositeDisposable;
 import seiko.neiko.R;
-import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.Permission;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.view.BaseView;
-import seiko.neiko.widget.fab.FloatingActionButton;
-import seiko.neiko.widget.fab.FloatingActionMenu;
 
 /**
  * Created by Seiko on 2016/10/1.
@@ -43,7 +42,7 @@ import seiko.neiko.widget.fab.FloatingActionMenu;
 public abstract class ActivityBase extends FragmentActivity implements BaseView {
     /** 贯穿全部 */
     protected static DdSource source;
-    private CompositeSubscription mCompositeSubscription;
+    private CompositeDisposable compositeDisposable;
 
     @Override
     protected void onStart() {
@@ -55,7 +54,7 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.activity_ani_enter, 0);
-        mCompositeSubscription = new CompositeSubscription();
+        compositeDisposable = new CompositeDisposable();
         setContentView(getLayoutId());
         ButterKnife.bind(this);
     }
@@ -112,6 +111,13 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
     protected void shiftView(final Fragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.frame_layout, fragment);
+        ft.commit();
+    }
+
+    public void shiftView2(final android.app.Fragment fragment) {
+        android.app.FragmentManager fm = getFragmentManager();
+        android.app.FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.frame_layout, fragment);
         ft.commit();
     }
@@ -185,23 +191,23 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
     protected void toast(String msg) {
         final Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         toast.show();
-        new Handler().postDelayed(() -> toast.cancel(), 500);
+        new Handler().postDelayed(() -> toast.cancel(), 1000);
     }
 
 
     //====================================================================
     /** RxJava相关 */
-    protected void addSubscription(int type, Action1<RxEvent> action) {
-        mCompositeSubscription.add(RxBus.getDefault().toObservable(type).subscribe(action));
+    protected void addSubscription(int type, Consumer<RxEvent> action) {
+        compositeDisposable.add(RxBus.getDefault().toObservable(type).subscribe(action));
     }
 
-    protected void addSubscription(Subscription subscription) {
-        mCompositeSubscription.add(subscription);
+    protected void addSubscription(Disposable disposable) {
+        compositeDisposable.add(disposable);
     }
 
     protected void detachView() {
-        if (mCompositeSubscription != null) {
-            mCompositeSubscription.unsubscribe();
+        if (compositeDisposable != null) {
+            compositeDisposable.dispose();
         }
     }
 

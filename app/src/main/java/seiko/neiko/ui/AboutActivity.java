@@ -15,6 +15,12 @@ public class AboutActivity extends SwipeLayoutBase {
     @Override
     public int getLayoutId() {return R.layout.activity_about;}
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        shiftView2(new SettingsFragment());
+    }
+
     public static class SettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -22,5 +28,6 @@ public class AboutActivity extends SwipeLayoutBase {
             addPreferencesFromResource(R.xml.settings);
         }
     }
+
 
 }

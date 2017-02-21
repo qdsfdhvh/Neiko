@@ -1,8 +1,5 @@
 package seiko.neiko.utils;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -22,8 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
-
-import seiko.neiko.app.App;
 
 /**
  * Created by Seiko on 2016/8/30.

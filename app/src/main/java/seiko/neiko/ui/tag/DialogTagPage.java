@@ -49,7 +49,5 @@ class DialogTagPage {
     }
 
     @OnClick(R.id.cancel)
-    void Cancel() {
-        alertDialog.dismiss();
-    }
+    void Cancel() {alertDialog.dismiss();}
 }

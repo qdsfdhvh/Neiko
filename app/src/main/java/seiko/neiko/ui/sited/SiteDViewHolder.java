@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

@@ -11,7 +11,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 

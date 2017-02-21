@@ -17,6 +17,8 @@ public class SdNodeSet implements ISdNode{
 
     private List<ISdNode> _items = new ArrayList<>();
 
+    protected void release(){_items.clear();}
+
     public final SdSource source;
 
     //---------------

@@ -9,7 +9,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import seiko.neiko.R;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 

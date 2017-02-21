@@ -2,18 +2,14 @@ package seiko.neiko.ui.section1;
 
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
 
 import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import seiko.neiko.R;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
-import seiko.neiko.models.SizeModel;
 import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 

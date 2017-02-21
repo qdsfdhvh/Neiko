@@ -12,9 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-
 import java.util.Arrays;
 
 import butterknife.BindView;

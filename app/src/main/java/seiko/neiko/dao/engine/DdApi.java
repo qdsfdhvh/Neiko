@@ -106,7 +106,7 @@ public class DdApi extends SdApi {
     }
 
     /** 加载封面并且判断类别 */
-    public static void setLabelText(String text, int type, LabelImageView iv) {
+    public static void setLabelText(String text, int dtype, LabelImageView iv) {
         if (!TextUtils.isEmpty(text)) {
 
             if (text.length()>5) {
@@ -115,7 +115,7 @@ public class DdApi extends SdApi {
             iv.setLabelText(text);
 
             int color;
-            switch (type) {
+            switch (dtype) {
                 case 1:
                 case 4:
                     color = ContextCompat.getColor(iv.getContext(), R.color.blue_500);

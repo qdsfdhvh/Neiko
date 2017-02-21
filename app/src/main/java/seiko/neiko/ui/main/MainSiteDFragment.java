@@ -1,10 +1,18 @@
 package seiko.neiko.ui.main;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.google.gson.reflect.TypeToken;
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -21,6 +29,7 @@ import seiko.neiko.rx.RxEvent;
 import seiko.neiko.app.FragmentBase;
 import seiko.neiko.utils.FileUtil;
 import seiko.neiko.widget.fab.FloatingActionButton;
+import seiko.neiko.widget.fab.FloatingActionMenu;
 import seiko.neiko.widget.helper.OnDragListener;
 import seiko.neiko.widget.helper.SimpleItemTouchHelperCallback;
 
@@ -36,14 +45,16 @@ public class MainSiteDFragment extends FragmentBase implements OnDragListener {
 
     @BindView(R.id.recView)
     RecyclerView recView;
-    @BindView(R.id.fab_refresh)
-    FloatingActionButton fab_button;
+    @BindView(R.id.fab_menu)
+    FloatingActionMenu menu;
+    @BindView(R.id.fab_delete)
+    FloatingActionButton fab_delete;
 
     private MainSiteDAdapter adapter;
-
     private List<ShowView> shows;
+    private boolean isdelete = false;
 
-    public void addShowView(ShowView mshowView) {
+    void addShowView(ShowView mshowView) {
         if (shows == null) {
             shows = new ArrayList<>();
         }
@@ -59,7 +70,7 @@ public class MainSiteDFragment extends FragmentBase implements OnDragListener {
         setRec();
         loadList();
         RxAndroid();
-        TouchHelper();
+        FabDelete();
     }
 
     private void setRec() {
@@ -68,53 +79,96 @@ public class MainSiteDFragment extends FragmentBase implements OnDragListener {
         recView.setLayoutManager(glm);
         recView.setHasFixedSize(true);
         recView.setAdapter(adapter);
-        FabScroll.showFab(recView, fab_button);
-    }
-
-    private void TouchHelper() {
-        new SimpleItemTouchHelperCallback(adapter)
-                .setmOnDragListener(this)
-                .attachToRecyclerView(recView);
+        FabScroll.showFab(recView, menu);
+        new SimpleItemTouchHelperCallback(adapter, this).attachToRecyclerView(recView);
     }
 
     //===============================================
-    private boolean isdelete = false;
     /** 删除模式 */
-    @OnClick(R.id.fab_refresh)
-    void fab_button() {
-        if (isdelete) {
-            fab_button.setSelected(false);
-            isdelete = false;
-            for (ShowView view:shows) {
-                view.ShowCheck(false);
+    private void FabDelete() {
+        RxView.clicks(fab_delete).subscribe((Void aVoid) -> {
+            if (isdelete) {
+                fab_delete.setSelected(false);
+                isdelete = false;
+                for (ShowView view:shows) {
+                    view.ShowCheck(false);
+                }
+            } else {
+                fab_delete.setSelected(true);
+                isdelete = true;
+                for (ShowView view:shows) {
+                    view.ShowCheck(true);
+                }
             }
-        } else {
-            fab_button.setSelected(true);
-            isdelete = true;
-            for (ShowView view:shows) {
-                view.ShowCheck(true);
-            }
-        }
-        adapter.setDelete(isdelete);
-        ischange = true;
+            adapter.setDelete(isdelete);
+            ischange = true;
+        });
     }
+    //===============================================
+    /** 打开插件中心 */
+    private AlertDialog dialog;
+
+    @OnClick(R.id.fab_web)
+    void onWeb() {
+        LinearLayout linear = new LinearLayout(getActivity());
+        linear.setOrientation(LinearLayout.VERTICAL);
+        Button bt1 = new Button(getActivity());
+        bt1.setText("插件中心");
+        Button bt2 = new Button(getActivity());
+        bt2.setText("独立插件");
+        Button bt3 = new Button(getActivity());
+        bt3.setText(String.valueOf("Guang插件"));
+        linear.addView(bt1);
+        linear.addView(bt2);
+        linear.addView(bt3);
+
+        rxView(bt1, "http://sited.noear.org/");
+        rxView(bt2, "http://sited.ka94.com/");
+        rxView(bt3, "http://guang.ka94.com/sited.html");
+
+        dialog = new AlertDialog.Builder(getActivity())
+                .setView(linear)
+                .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())
+                .create();
+        dialog.show();
+    }
+
+    private void rxView(View v, String url) {
+        RxView.clicks(v).subscribe((Void aVoid) -> {
+            dialog.dismiss();
+
+            final Uri uri = Uri.parse(url);
+            final Intent it = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(it);
+        });
+    }
+
+
 
     //=====================================
     /** RxBus */
     private void RxAndroid() {
-        addSubscription(RxEvent.EVENT_MAIN_SITED, (RxEvent event) -> {
-            SourceModel m = new SourceModel();
-            m.title = (String) event.getData();
-            m.url   = (String) event.getData(1);
-            adapter.addSiteD(m);
-            saveData();
-        });
 
         addSubscription(RxEvent.EVENT_COPY_SITED, (RxEvent event) -> {
             adapter.clear();
             adapter.addAll(SiteDbApi.getSources());
             adapter.notifyDataSetChanged();
         });
+    }
+
+    //=====================================
+    /** 添加siteD */
+    void addSiteD(SourceModel m) {
+        if (adapter != null) {
+            for (SourceModel m1:adapter.getData()) {
+                if (m1.title.contains(m.title))
+                    return;
+            }
+
+            adapter.add(m);
+
+            saveData();
+        }
     }
 
     //=====================================

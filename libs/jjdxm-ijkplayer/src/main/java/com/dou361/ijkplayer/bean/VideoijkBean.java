@@ -1,5 +1,7 @@
 package com.dou361.ijkplayer.bean;
 
+import java.util.Map;
+
 /**
  * ========================================
  * <p>
@@ -24,23 +26,37 @@ public class VideoijkBean {
     /**
      * id
      */
-    int id;
+    private int id;
     /**
      * 分辨率名称
      */
-    String stream;
+    private String stream;
     /**
      * 分辨率对应视频地址
      */
-    String url;
+    private String url;
     /**
      * 备注备用
      */
-    String remarks;
+    private String remarks;
     /**
      * 当前选中的
      */
-    boolean select;
+    private boolean select;
+
+    private Map<String, String> headers;
+
+    private String type;
+    private String mime;
+    private String logo;
+
+    public VideoijkBean() {
+
+    }
+
+    public VideoijkBean(String url) {
+        this.url = url;
+    }
 
     public int getId() {
         return id;
@@ -82,6 +98,13 @@ public class VideoijkBean {
         this.select = select;
     }
 
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -104,5 +127,29 @@ public class VideoijkBean {
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (remarks != null ? remarks.hashCode() : 0);
         return result;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setMime(String mime) {
+        this.mime = mime;
+    }
+
+    public String getMime() {
+        return mime;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

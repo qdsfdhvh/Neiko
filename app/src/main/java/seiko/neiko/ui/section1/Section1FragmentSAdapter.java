@@ -16,16 +16,12 @@ import zlc.season.practicalrecyclerview.AbstractAdapter;
 class Section1FragmentSAdapter extends AbstractAdapter<Book, Section1FragmentSViewHolder> {
 
     private String refererUrl;
-    private List<SizeModel> sizes;
 
     Section1FragmentSAdapter(String refererUrl) {
         this.refererUrl = refererUrl;
-        sizes = new ArrayList<>();
     }
 
     String getRefererUrl() {return refererUrl;}
-
-    List<SizeModel> getSizes() {return sizes;}
 
     //=====================================
     @Override

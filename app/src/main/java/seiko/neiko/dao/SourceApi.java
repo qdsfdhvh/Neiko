@@ -3,7 +3,6 @@ package seiko.neiko.dao;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.utils.FileUtil;
 import seiko.neiko.utils.HintUtil;
 
-import static seiko.neiko.dao.mPath.sitedPath;
 
 /**
  * Created by Seiko on 2016/8/29.
@@ -75,18 +73,18 @@ public class SourceApi {
                 return sd;
         }
 
-        File file = new File(sitedPath);
-        for(File file1 : file.listFiles()) {
-            String path = mPath.getSitedPath(file1.getName());
-
-            if (!TextUtils.isEmpty(path)) {
-                String sited = FileUtil.readTextFromSDcard(path);
-                DdSource source = loadSource(sited, null);
-                if (source.isMatch(url)) {
-                    return source;
-                }
-            }
-        }
+//        File file = new File(sitedPath);
+//        for(File file1 : file.listFiles()) {
+//            String path = mPath.getSitedPath(file1.getName());
+//
+//            if (!TextUtils.isEmpty(path)) {
+//                String sited = FileUtil.readTextFromSDcard(path);
+//                DdSource source = loadSource(sited, null);
+//                if (source.isMatch(url)) {
+//                    return source;
+//                }
+//            }
+//        }
         return null;
     }
 

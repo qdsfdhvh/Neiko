@@ -6,7 +6,9 @@ import android.view.WindowManager;
 import com.dou361.ijkplayer.bean.VideoijkBean;
 import com.dou361.ijkplayer.widget.PlayerView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import seiko.neiko.R;
 import seiko.neiko.app.FragmentBase;

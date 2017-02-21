@@ -11,7 +11,6 @@ import org.noear.sited.SdSource;
 import java.util.HashMap;
 
 import seiko.neiko.dao.db.SiteDbApi;
-import seiko.neiko.utils.HttpUtil;
 
 
 /**
@@ -46,7 +45,8 @@ public class DdSource extends SdSource {
     private ISdNode _tag;
     private ISdNode _book;
     private ISdNode _section;
-    private ISdNode _object;
+    private ISdNode _objectSlf;
+    private ISdNode _objectExt;
 
     public DdNode tag(String url){
         Log.v("tag.selct::",url);
@@ -61,9 +61,16 @@ public class DdSource extends SdSource {
         return  (DdNode)_section.nodeMatch(url);
     }
 
-    public DdNode object1(String url){
+    public DdNode objectEx(String url){
         Log.v("object.selct::",url);
-        return  (DdNode)_object.nodeMatch(url);
+
+        return  (DdNode)_objectExt.nodeMatch(url);
+    }
+
+    public DdNode objectSlf(String url){
+        Log.v("object.selct::",url);
+
+        return  (DdNode)_objectSlf.nodeMatch(url);
     }
 
     private final String trace_url;
@@ -75,16 +82,13 @@ public class DdSource extends SdSource {
 
         if (xml.startsWith("sited::")) {
             int start = xml.indexOf("::") + 2;
-            Log.d("DdSource","start:" + start);
             int end = xml.lastIndexOf("::");
-            Log.d("DdSource","end:" + end);
             String txt = xml.substring(start, end);
             String key = xml.substring(end + 2);
-            Log.d("DdSource"," key:" +  key);
             xml = DdApi.unsuan(txt, key);
         }
 
-        sited = xml;
+        //sited = xml;
 
         doInit(app, xml);
         if(schema > 0) {
@@ -101,6 +105,7 @@ public class DdSource extends SdSource {
         meta = (DdNodeSet) head;
         main = (DdNodeSet) body;
 
+        //--------------
 
         sds = head.attrs.getString("sds");
         engine = head.attrs.getInt("engine");
@@ -136,19 +141,23 @@ public class DdSource extends SdSource {
         _tag = main.get("tag");
         _book = main.get("book");
         _section = main.get("section");
-        _object = main.get("object");
+        _objectSlf = main.get("object");
+        _objectExt = _objectSlf;
 
-        if (_object.isEmpty()) {
+        if (_objectExt.isEmpty()) {
             if (_section.isEmpty())
-                _object = _book;
+                _objectExt = _book;
             else
-                _object = _section;
+                _objectExt = _section;
         }
 
+        //-----------
 
-        String jsCode = "SiteD=" +
-                "{" + "ver"+":"+ DdApi.version() + "};" +
-                "SiteD.get=SdExt.get;SiteD.set=SdExt.set;";
+        String jsCode = "SiteD={" +
+                "ver:" + DdApi.version() +
+                "};" +
+                "SiteD.get=SdExt.get;" +
+                "SiteD.set=SdExt.set;";
 
         loadJs(jsCode);
     }
@@ -181,22 +190,22 @@ public class DdSource extends SdSource {
 
     @Override
     protected void DoTraceUrl(String url, String args, SdNode config) {
-        if (!TextUtils.isEmpty(trace_url)) {
-            if (!TextUtils.isEmpty(url)) {
-                try {
-                    HashMap<String, String> data = new HashMap<>();
-
-                    data.put("url", url);
-                    data.put("args", args);
-                    data.put("node", config.name);
-
-                    HttpUtil.post(trace_url, data, (code, text) -> {
-                    });
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
+//        if (!TextUtils.isEmpty(trace_url)) {
+//            if (!TextUtils.isEmpty(url)) {
+//                try {
+//                    HashMap<String, String> data = new HashMap<>();
+//
+//                    data.put("url", url);
+//                    data.put("args", args);
+//                    data.put("node", config.name);
+//
+////                    HttpUtil.post(trace_url, data, (code, text) -> {
+////                    });
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     public static boolean isHots(SdNode node){return "hots".equals(node.name);}

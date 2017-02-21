@@ -7,8 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lid.lib.LabelImageView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -16,7 +14,7 @@ import butterknife.OnLongClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.dao.db.DbApi;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
 import seiko.neiko.utils.HintUtil;
 import seiko.neiko.widget.ScaleImageView;

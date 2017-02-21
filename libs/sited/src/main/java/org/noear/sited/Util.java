@@ -1,13 +1,9 @@
 package org.noear.sited;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -21,10 +17,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.impl.client.DefaultRedirectHandler;
-import cz.msebera.android.httpclient.protocol.HttpContext;
+import okhttp.OkCallback;
+import okhttp.OkHttpProxy;
+import okhttp.OkTextParser;
 
 
 /**
@@ -117,64 +112,47 @@ class Util {
     }
 
     private static void doHttp(SdSource source, HttpMessage msg, __CacheBlock cache, HttpCallback callback) {
-        AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
-
-        client.setUserAgent(msg.ua);
-        client.setURLEncodingEnabled(msg.url.indexOf(" ") > 0);
-
-        for (String key : msg.header.keySet()){
-            client.addHeader(key, msg.header.get(key));
-        }
-
         __AsyncTag httpTag = new __AsyncTag();
 
-        TextHttpResponseHandler responseHandler = new TextHttpResponseHandler(msg.encode) {
+        OkCallback callback1 = new OkCallback<String>(new OkTextParser(msg.encode)) {
+            @Override
+            public void onSuccess(String cookie, String s) {
+                source.setCookies(cookie);
+                callback.run(1, msg, s, httpTag.str0);
+            }
 
             @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, String s, Throwable throwable) {
-
-                Util.log(source,"http.onFailure",throwable.getMessage(),throwable);
+            public void onFailure(Throwable e) {
+                Util.log(source,"http.onFailure", e.getMessage(), e);
 
                 if (cache == null || cache.value == null)
                     callback.run(-2, msg, null, null);
                 else
                     callback.run(1, msg, cache.value, httpTag.str0);
             }
-
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String s) {
-                for (Header h1 : headers) {
-                    if ("Set-Cookie".equals(h1.getName())) {
-                        source.setCookies(h1.getValue());
-                        break;
-                    }
-                }
-
-                callback.run(1, msg, s,httpTag.str0);
-            }
         };
 
-        client.setEnableRedirects(true);
-        client.setRedirectHandler(new DefaultRedirectHandler(){
-            @Override
-            public boolean isRedirectRequested(HttpResponse response, HttpContext context) {
-                int statusCode = response.getStatusLine().getStatusCode();
-
-                if (statusCode == 302 || statusCode == 301) {
-                    httpTag.str0 = response.getFirstHeader("Location").getValue();
-
-                    if (!httpTag.str0.startsWith("http")) {
-                        Uri uri = Uri.parse(msg.url);
-                        httpTag.str0 = uri.getScheme() + "://" + uri.getHost() + httpTag.str0;
-                    }
-
-                    Log.v("orgurl", msg.url);
-                    Log.v("302url", httpTag.str0);
-                }
-
-                return super.isRedirectRequested(response, context);
-            }
-        });
+//        client.setEnableRedirects(true);
+//        client.setRedirectHandler(new DefaultRedirectHandler(){
+//            @Override
+//            public boolean isRedirectRequested(HttpResponse response, HttpContext context) {
+//                int statusCode = response.getStatusLine().getStatusCode();
+//
+//                if (statusCode == 302 || statusCode == 301) {
+//                    httpTag.str0 = response.getFirstHeader("Location").getValue();
+//
+//                    if (!httpTag.str0.startsWith("http")) {
+//                        Uri uri = Uri.parse(msg.url);
+//                        httpTag.str0 = uri.getScheme() + "://" + uri.getHost() + httpTag.str0;
+//                    }
+//
+//                    Log.v("orgurl", msg.url);
+//                    Log.v("302url", httpTag.str0);
+//                }
+//
+//                return super.isRedirectRequested(response, context);
+//            }
+//        });
 
 
         try {
@@ -186,13 +164,25 @@ class Util {
                 url2 = msg.url;
 
             if ("post".equals(msg.method)) {
-                RequestParams postData = new RequestParams(msg.form);
-                postData.setContentEncoding(msg.encode);
-
-                client.post(url2, postData, responseHandler);
+                OkHttpProxy.post()
+                        .url(url2)
+                        .setParams(msg.form)
+                        .enqueue(callback1);
             } else {
-                client.get(url2, responseHandler);
+                OkHttpProxy.get()
+                        .url(url2)
+                        .setHeaders(msg.header)
+                        .enqueue(callback1);
             }
+
+//            if ("post".equals(msg.method)) {
+//                RequestParams postData = new RequestParams(msg.form);
+//                postData.setContentEncoding(msg.encode);
+//
+//                client.post(url2, postData, responseHandler);
+//            } else {
+//                client.get(url2, responseHandler);
+//            }
         } catch (Exception ex) {
             if (cache == null)
                 callback.run(-2, msg, null, null);

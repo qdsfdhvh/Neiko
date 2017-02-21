@@ -1,7 +1,7 @@
 package org.noear.sited;
 
 /**
- * Created by yuety on 15/10/10.
+ * Created by yuety on 15/10/10. Y
  */
 
 import java.util.Date;
@@ -13,7 +13,7 @@ class __CacheBlock {
     public boolean isOuttime(SdNode config) {
         if(time==null || value == null){
             return true;
-        }else {
+        } else {
             if(config.cache == 1)
                 return false;
             else {

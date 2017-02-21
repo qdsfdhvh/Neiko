@@ -6,27 +6,27 @@ import android.os.Handler;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import seiko.neiko.R;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.dao.SourceApi;
-import seiko.neiko.dao.db.SiteDbApi;
-import seiko.neiko.dao.mPath;
-import seiko.neiko.models.SourceModel;
-import seiko.neiko.utils.FileUtil;
+import seiko.neiko.models.Book;
 import seiko.neiko.viewModels.SearchViewModel;
 import seiko.neiko.app.SwipeLayoutBase;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
@@ -84,14 +84,13 @@ public class SearchActivity extends SwipeLayoutBase {
     }
 
     //=================================
-    private Handler handler = new Handler();
     /** 是否为多插件搜索 */
     private void isallSource(String key, boolean allSource) {
         adapter.clear();
         adapter.notifyDataSetChanged();
         adapter.showLoading();
         if (allSource) {
-            handler.postDelayed(() -> addSubscription(subscription(key)), 300);
+            addSubscription(disposable(key));
         } else {
             DoLoadViewModel(source, key);
         }
@@ -99,15 +98,25 @@ public class SearchActivity extends SwipeLayoutBase {
 
     //=================================
     /** 创建多任务subscription */
-    private Subscription subscription(String key) {
-        File file = new File(sitedPath);
-        return Observable.from(file.listFiles())
-                .subscribeOn(Schedulers.newThread())
+    private Disposable disposable(String key) {
+        return Flowable.create((FlowableEmitter<String> e) -> {
+                        File file = new File(sitedPath);
+                        for (File file1 : file.listFiles()) {
+                            String name = file1.getName().replace(".sited", "");
+                            e.onNext(name);
+                        }
+                        e.onComplete();
+                }, BackpressureStrategy.ERROR)
+                .delay(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((File file1) ->{
-                    DdSource source = SourceApi.getDefault().getByTitle(file1.getName());
-                    if (source != null) {
-                        DoLoadViewModel(source, key);
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String name) throws Exception {
+                        DdSource source = SourceApi.getDefault().getByTitle(name);
+                        if (source != null) {
+                            DoLoadViewModel(source, key);
+                        }
                     }
                 });
     }
@@ -118,8 +127,14 @@ public class SearchActivity extends SwipeLayoutBase {
         SearchViewModel viewModel = new SearchViewModel();
         viewModel.clear();
         source.getNodeViewModel(viewModel, false, key, 1, source.search, (code) -> {
-            if (code == 1)
-                adapter.addAll(viewModel.mDatas);
+            if (code == 1) {
+                int size = adapter.getDataSize();
+                if (size == 0)
+                    adapter.addAll(viewModel.mDatas);
+                else
+                    adapter.insertAllBack(size - 1, viewModel.mDatas);
+            }
         });
     }
+
 }

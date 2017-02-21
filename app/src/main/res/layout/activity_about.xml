@@ -5,9 +5,8 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <fragment
-        android:id="@+id/fragment_setting"
-        android:name="seiko.neiko.ui.AboutActivity$SettingsFragment"
+    <FrameLayout
+        android:id="@+id/frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

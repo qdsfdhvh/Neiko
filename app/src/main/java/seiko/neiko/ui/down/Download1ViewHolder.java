@@ -20,7 +20,7 @@ import butterknife.OnLongClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.SourceApi;
 import seiko.neiko.dao.db.DownDbApi;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.DownBookBean;
 import seiko.neiko.ui.book.AnimeBookActivity;
 import seiko.neiko.ui.book.BookModel;
@@ -73,7 +73,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
         data.setTotal(total);
 
         //封面
-        ImageLoader.getDefault().display(mContext, mImg, data.getImage(), data.getTitle());
+        ImageLoader.getDefault().display(mContext, mImg, data.getImage(), data.getTitle(), data.getUrl());
         setLabelText(data.getSource(), data.getDtype(), mImg);
         //漫画名
         mtitle.setText(data.getTitle());

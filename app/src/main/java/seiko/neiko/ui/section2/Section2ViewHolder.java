@@ -4,14 +4,13 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import seiko.neiko.R;
-import seiko.neiko.dao.ImageLoader;
+import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.TxtModel;
 import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;

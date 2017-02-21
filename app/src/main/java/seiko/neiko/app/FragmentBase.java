@@ -3,7 +3,6 @@ package seiko.neiko.app;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +12,16 @@ import android.widget.Toast;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
-import seiko.neiko.dao.FabScroll;
+//import rx.Subscription;
+//import rx.functions.Action1;
+//import rx.subscriptions.CompositeSubscription;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.models.Book;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.view.FragmentView;
-import seiko.neiko.widget.fab.FloatingActionButton;
-import seiko.neiko.widget.fab.FloatingActionMenu;
 
 /**
  * Created by Seiko on 2016/11/15. YiKu
@@ -47,23 +46,25 @@ public abstract class FragmentBase extends Fragment implements FragmentView {
 
     //==================================================
     /** Rx订阅 */
-    private CompositeSubscription mCompositeSubscription;
 
-    private void Subscription() {mCompositeSubscription = new CompositeSubscription();}
+    private CompositeDisposable compositeDisposable;
 
-    protected void addSubscription(int type, Action1<RxEvent> action) {
-        mCompositeSubscription.add(RxBus.getDefault().toObservable(type).subscribe(action));
+    private void Subscription() {compositeDisposable = new CompositeDisposable();}
+
+    protected void addSubscription(int type, Consumer<RxEvent> action) {
+        compositeDisposable.add(RxBus.getDefault().toObservable(type).subscribe(action));
     }
 
-    protected void addSubscription(Subscription subscription) {
-        mCompositeSubscription.add(subscription);
+    protected void addSubscription(Disposable disposable) {
+        compositeDisposable.add(disposable);
     }
 
     protected void detachView() {
-        if (mCompositeSubscription != null) {
-            mCompositeSubscription.unsubscribe();
+        if (compositeDisposable != null) {
+            compositeDisposable.dispose();
         }
     }
+
 
     //==================================================
     /** 某个数值在list中的位置 */

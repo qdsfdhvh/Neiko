@@ -3,6 +3,7 @@ package seiko.neiko.viewModels;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.dou361.ijkplayer.bean.VideoijkBean;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,7 +25,13 @@ public class VideoViewModel extends ViewModelBase implements ISdViewModel {
 
     public String name;
     public String logo;
-    public List<MediaModel> items = new ArrayList<>();
+    public List<VideoijkBean> list;
+    private int i;
+
+    public VideoViewModel() {
+        list = new ArrayList<>();
+        i = 1;
+    }
 
     @Override
     public void loadByConfig(SdNode config) {
@@ -52,18 +59,24 @@ public class VideoViewModel extends ViewModelBase implements ISdViewModel {
                 }
 
                 for (JsonElement el:array) {
-                    items.add(new MediaModel(
-                            getString(el.getAsJsonObject(), "url"),
-                            getString(el.getAsJsonObject(), "type"),
-                            getString(el.getAsJsonObject(), "mime"),
-                            getString(el.getAsJsonObject(), "logo")
-                    ));
+                    VideoijkBean bean = new VideoijkBean();
+                    bean.setStream("第"+ i +"段");
+                    bean.setUrl(getString(el.getAsJsonObject(), "url"));
+                    bean.setType(getString(el.getAsJsonObject(), "type"));
+                    bean.setMime(getString(el.getAsJsonObject(), "mime"));
+                    bean.setLogo(getString(el.getAsJsonObject(), "logo"));
+                    list.add(bean);
+                    i++;
                 }
 
             } else {
                 for (String url:json.split(";")) {
                     if (url.length() > 6) {
-                        items.add(new MediaModel(url));
+                        VideoijkBean bean = new VideoijkBean();
+                        bean.setStream("第"+ i +"段");
+                        bean.setUrl(url);
+                        list.add(bean);
+                        i++;
                     }
                 }
             }

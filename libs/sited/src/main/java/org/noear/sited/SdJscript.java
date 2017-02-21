@@ -20,22 +20,33 @@ class SdJscript {
     public final String code;
     public final SdSource s;
 
-    SdJscript(SdSource source, Element node) {
+    protected void release() {
+
+    }
+
+    protected SdJscript(SdSource source, Element node) {
         s = source;
 
         if (node == null) {
             code = "";
             require = Util.createNode(source).buildForNode(null);
         } else {
-            Element element = Util.getElement(node, "code");
-            if (element != null) {
-                code = element.getTextContent();
-                require = Util.createNode(source).buildForNode(Util.getElement(node, "require"));
-            } else {
-                code = "";
-                require = null;
-            }
+            code = Util.getElement(node, "code").getTextContent();
+            require = Util.createNode(source).buildForNode(Util.getElement(node, "require"));
         }
+//        if (node == null) {
+//            code = "";
+//            require = Util.createNode(source).buildForNode(null);
+//        } else {
+//            Element element = Util.getElement(node, "code");
+//            if (element != null) {
+//                code = element.getTextContent();
+//                require = Util.createNode(source).buildForNode(Util.getElement(node, "require"));
+//            } else {
+//                code = "";
+//                require = null;
+//            }
+//        }
     }
 
     void loadJs(Application app, JsEngine js) {
@@ -51,7 +62,7 @@ class SdJscript {
                 //2.尝试网络加载
                 Log.v("SdJscript", n1.url);
 
-                if(n1.cache==0) {
+                if(n1.cache == 0) {
                     n1.cache = 1; //长久缓存js文件 //默认长久缓存
                 }
 

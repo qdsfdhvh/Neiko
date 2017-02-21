@@ -31,6 +31,15 @@ public class SdSource {
     public String expr;//匹配源的表达式
 
 
+    public void release() {
+        js.release();
+        attrs.clear();
+        head.release();
+        body.release();
+
+        script.release();
+    }
+
     private String _encode;//编码
     String encode() {return _encode;}
 
@@ -57,9 +66,8 @@ public class SdSource {
 
     //-------------------------------
     JsEngine js;//不能作为属性
-//    protected SdJscript script;
+    SdJscript script;
 
-    //-------------------------------
     private Element root;
     protected String  xmlBodyName;
     protected String  xmlHeadName;
@@ -128,7 +136,7 @@ public class SdSource {
 
         if(schema == 0) {
             head.attrs = this.attrs;
-        }else{
+        } else {
             head.attrs.addAll(this.attrs);
         }
 
@@ -148,7 +156,7 @@ public class SdSource {
         //3.script :: 放后面
         //
         js = new JsEngine(app, this);
-        SdJscript script = new SdJscript(this, Util.getElement(root, xmlScriptName));
+        script = new SdJscript(this, Util.getElement(root, xmlScriptName));
         script.loadJs(app, js);
 
         root = null;
@@ -169,9 +177,9 @@ public class SdSource {
         return m.find();
     }
 
-    protected void loadJs(String jsCode){js.loadJs(jsCode);}
+    public void loadJs(String jsCode){js.loadJs(jsCode);}
 
-    protected String callJs(SdNode config, String funAttr, String... args) {
+    public String callJs(SdNode config, String funAttr, String... args) {
         return js.callJs(config.attrs.getString(funAttr), args);
     }
     //-------------
@@ -179,7 +187,6 @@ public class SdSource {
 
 
     private String parse(SdNode config, String url, String html) {
-
         Log.v("parse", url);
         Log.v("parse", html == null ? "null" : html);
 
@@ -187,9 +194,9 @@ public class SdSource {
             return html;
         }
 
-        if ("@null".equals(config.parse)) //如果是@null，说明不需要通过js解析
+        if ("@null".equals(config.parse)) { //如果是@null，说明不需要通过js解析
             return html;
-        else {
+        } else {
             String temp = js.callJs(config.parse, url, html);
 
             if (temp == null) {
@@ -205,7 +212,12 @@ public class SdSource {
         Log.v("parseUrl", url);
         Log.v("parseUrl", html == null ? "null" : html);
 
-        return js.callJs(config.parseUrl, url, html);
+        String temp = js.callJs(config.parseUrl, url, html);
+
+        if(temp == null)
+            return "";
+        else
+            return temp;
     }
 
 
@@ -219,7 +231,7 @@ public class SdSource {
 
         for (ISdNode node : nodeSet.nodes()) {
             SdNode n = (SdNode) node;
-            doGetNodeViewModel2(viewModel, isUpdate, tag, n.url, null, n, dataContext,callback);
+            doGetNodeViewModel2(viewModel, isUpdate, tag, n.url, null, n, dataContext, callback);
         }
 
         if (tag.total == 0) {
@@ -269,74 +281,79 @@ public class SdSource {
             return;
         }
 
-        msg.rebuild(config);
+        if (!TextUtils.isEmpty(msg.url)) {
+            msg.rebuild(config);
 
-        if ("post".equals(config.method)) {
-            msg.rebuildForm(page, key);
-        } else {
-            msg.url = msg.url.replace("@page", page + "");
-            if (key != null) {
-                msg.url = msg.url.replace("@key", Util.urlEncode(key, config));
-            }
-        }
-
-        final int pageX = page;
-        final String keyX = key;
-
-        tag.total++;
-
-        msg.callback = (code, sender, text, url302) -> {
-            tag.value++;
-            if (code == 1) {
-
-                if(TextUtils.isEmpty(url302)) {
-                    url302 = sender.url;
+            if ("post".equals(config.method)) {
+                msg.rebuildForm(page, key);
+            } else {
+                msg.url = msg.url.replace("@page", page + "");
+                if (key != null) {
+                    msg.url = msg.url.replace("@key", Util.urlEncode(key, config));
                 }
+            }
 
-                if (!TextUtils.isEmpty(config.parseUrl)) { //url需要解析出来(多个用;隔开)
-                    List<String> newUrls = new ArrayList<>();
-                    String[] rstUrls = parseUrl(config, url302, text).split(";");
+            final int pageX = page;
+            final String keyX = key;
 
-                    for(String url1 : rstUrls) {
-                        if(url1.length() == 0)
-                            continue;
+            msg.callback = (code, sender, text, url302) -> {
+                tag.value++;
+                if (code == 1) {
 
-                        if(url1.startsWith(Util.NEXT_CALL)){
-                            HttpMessage msg0 = new HttpMessage();
-                            msg0.url = url1.replace(Util.NEXT_CALL,"")
-                                           .replace("GET::","")
-                                           .replace("POST::","");
+                    if(TextUtils.isEmpty(url302)) {
+                        url302 = sender.url;
+                    }
 
-                            msg0.rebuild(config);
+                    if (!TextUtils.isEmpty(config.parseUrl)) { //url需要解析出来(多个用;隔开)
+                        List<String> newUrls = new ArrayList<>();
+                        String[] rstUrls = parseUrl(config, url302, text).split(";");
 
-                            if(url1.indexOf("POST::") > 0) {
-                                msg0.method = "post";
-                                msg0.rebuildForm(pageX, keyX);
+                        for(String url1 : rstUrls) {
+                            if(url1.length() == 0)
+                                continue;
+
+                            if(url1.startsWith(Util.NEXT_CALL)){
+                                HttpMessage msg0 = new HttpMessage();
+                                msg0.url = url1.replace(Util.NEXT_CALL,"")
+                                        .replace("GET::","")
+                                        .replace("POST::","");
+
+                                msg0.rebuild(config);
+
+                                if(url1.indexOf("POST::") > 0) {
+                                    msg0.method = "post";
+                                    msg0.rebuildForm(pageX, keyX);
+                                } else {
+                                    msg0.method = "get";
+                                }
+
+                                msg0.callback = msg.callback;
+
+                                Util.http(this, isUpdate, msg0);
                             } else {
-                                msg0.method = "get";
+                                newUrls.add(url1);
                             }
-
-                            msg0.callback = msg.callback;
-
-                            Util.http(this, isUpdate, msg0);
-                        } else {
-                            newUrls.add(url1);
                         }
-                    }
 
-                    if(newUrls.size() > 0) {
-                        doParseUrl_Aft(viewModel, config, isUpdate, newUrls, sender.form, tag, dataContext, callback);
+                        if(newUrls.size() > 0) {
+                            doParseUrl_Aft(viewModel, config, isUpdate, newUrls, sender.form, tag, dataContext, callback);
+                        }
+                        return;
                     }
-                    return;
+                    else {
+                        doParse_noAddin(viewModel, config, url302, text);
+                    }
                 }
-                else {
-                    doParse_noAddin(viewModel, config, url302, text);
-                }
-            }
-            callback.run(code);
-        };
 
-        Util.http(this, isUpdate, msg);
+                //callback.run(code);
+                if (tag.total == tag.value) {
+                    callback.run(code);
+                }
+            };
+
+            tag.total++;
+            Util.http(this, isUpdate, msg);
+        }
 
         if (config.hasAdds()) {
             //2.2 获取副内容（可能有多个）
@@ -380,7 +397,6 @@ public class SdSource {
 
     private void doGetNodeViewModel2(ISdViewModel viewModel, boolean isUpdate, final __AsyncTag tag, String url, Map<String, String> args, SdNode config, DataContext dataContext, SdSourceCallback callback) {
         //需要对url进行转换成最新的格式（可能之前的旧的格式缓存）
-
         if (config.isEmpty())
             return;
 
@@ -404,11 +420,11 @@ public class SdSource {
                 msg.form = args;
             }
 
+            //为doParseUrl_Aft服务(要在外围)
+            //Map<Integer, String> dataList = new HashMap<>();//如果有多个地址，需要排序
+
             //2.获取主内容
-            tag.total++;
-
-
-            msg.url = config.getUrl(url);
+            msg.url = config.getUrl(url,args);
 
             //有缓存的话，可能会变成同步了
             msg.rebuild(config);
@@ -466,12 +482,12 @@ public class SdSource {
                     }
                 }
 
-
                 if (tag.total == tag.value) {
                     callback.run(code);
                 }
             };
 
+            tag.total++;
             Util.http(this, isUpdate, msg);
         }
 
@@ -490,6 +506,7 @@ public class SdSource {
     private void doParseUrl_Aft(ISdViewModel viewModel, SdNode config, boolean isUpdate, List<String> newUrls, Map<String, String> args, __AsyncTag tag, DataContext dataContext, SdSourceCallback callback) {
         for (String newUrl2 : newUrls) {
             tag.total++;
+            //tag.num --;
 
             HttpMessage msg = new HttpMessage(config, newUrl2, tag.total, args);
 
@@ -500,7 +517,6 @@ public class SdSource {
                     if(TextUtils.isEmpty(url302)) {
                         url302 = newUrl2;
                     }
-
                     doParse_noAddinForTmp(dataContext, config, url302, text2, sender.tag);
                 }
 

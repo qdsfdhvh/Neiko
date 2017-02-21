@@ -25,7 +25,7 @@
         android:theme="@style/AppTheme.Splash">
 
         <meta-data
-            android:name="seiko.neiko.dao.CustomModule"
+            android:name="seiko.neiko.glide.CustomModule"
             android:value="GlideModule"/>
 
         <activity

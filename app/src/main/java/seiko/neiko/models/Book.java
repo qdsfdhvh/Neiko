@@ -39,9 +39,6 @@ public class Book implements ItemType {
 
     private int number;
 
-
-
-
     public Book() {
     }
 
@@ -217,21 +214,6 @@ public class Book implements ItemType {
     }
 
     //==============================================
-    public void setSection_count(int section_count) {
-        this.section_count = section_count;
-    }
-
-    public void setLast_surl(String last_surl) {
-        this.last_surl = last_surl;
-    }
-
-    public void setLast_pidx(int last_pidx) {
-        this.last_pidx = last_pidx;
-    }
-
-    public void setLast_page(int last_page) {
-        this.last_page = last_page;
-    }
 
     public int getSection_count() {
         return section_count;

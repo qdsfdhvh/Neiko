@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by yuety on 16/2/1.
+ * Created by yuety on 16/2/1. Y
  */
 public class SdAttributeList {
     private Map<String,String> _items;

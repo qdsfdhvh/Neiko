@@ -1,7 +1,14 @@
 package seiko.neiko.dao;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.support.annotation.Nullable;
+
+import java.util.List;
 
 import seiko.neiko.models.BookInfBean;
 import seiko.neiko.models.DownSectionBean;
@@ -135,6 +142,30 @@ public class mIntent {
         Section1FragmentBase.imgindex = bean.getIndex();
         Intent intent1 = new Intent(context, Section1Activity.class);
         context.startActivity(intent1);
+    }
+
+    public static void Intent_MX(Context context, String url) {
+        Intent intent = new Intent();
+        intent.setDataAndType(Uri.parse(url), "video/*");
+        ComponentName MX = pm_MX(context);
+        if (MX != null) {
+            intent.setComponent(MX);
+        }
+        context.startActivity(intent);
+    }
+
+    @Nullable
+    private static ComponentName pm_MX(Context context) {
+        PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> listAppcations = pm.getInstalledApplications(0);
+        for (ApplicationInfo app : listAppcations) {
+            if (app.packageName.indexOf("mxtech") > 0) {
+                String pkg = app.packageName;
+                String cls = pkg + ".ActivityScreen";
+                return new ComponentName(pkg, cls);
+            }
+        }
+        return null;
     }
 
 }

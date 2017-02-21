@@ -1,4 +1,4 @@
-package seiko.neiko.dao;
+package seiko.neiko.glide;
 
 import android.content.Context;
 
@@ -6,10 +6,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
+import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.GlideModule;
 import com.bumptech.glide.request.target.ViewTarget;
 
 import java.io.File;
+import java.io.InputStream;
 
 import seiko.neiko.R;
 
@@ -42,5 +44,6 @@ public class CustomModule implements GlideModule {
     @Override
     public void registerComponents(Context context, Glide glide) {
         // register ModelLoaders here.
+        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory());
     }
 }

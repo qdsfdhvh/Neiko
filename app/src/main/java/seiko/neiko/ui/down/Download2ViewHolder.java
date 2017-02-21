@@ -16,7 +16,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
-import rx.Subscription;
+//import rx.Subscription;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
 import seiko.neiko.R;
 import seiko.neiko.dao.db.DownDbApi;
 import seiko.neiko.dao.mIntent;
@@ -56,7 +58,8 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
     private Download2Adapter mAdapter;
     private DownSectionBean mData;
     private Context mContext;
-    private Subscription rx1;
+//    private Subscription rx1;
+    private Disposable rx1;
 
     private String path;      //保存路径
 

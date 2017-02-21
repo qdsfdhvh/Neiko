@@ -18,7 +18,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     private final ItemTouchHelperAdapter mAdapter;
     private OnDragListener mOnDragListener;
 
-    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
+    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter, OnDragListener mOnDragListener) {
+        this.mOnDragListener = mOnDragListener;
         mAdapter = adapter;
     }
 
@@ -104,10 +105,5 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         if (mOnDragListener != null) {
             mOnDragListener.onFinishDrag();
         }
-    }
-
-    public SimpleItemTouchHelperCallback setmOnDragListener(OnDragListener mOnDragListener) {
-        this.mOnDragListener = mOnDragListener;
-        return this;
     }
 }

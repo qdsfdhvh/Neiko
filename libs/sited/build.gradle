@@ -26,9 +26,9 @@ android {
 
 
 dependencies {
-    compile 'com.loopj.android:android-async-http:1.4.9'
+    //compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.eclipsesource.j2v8:j2v8:3.1.6@aar'
-    //compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
 }
 
 

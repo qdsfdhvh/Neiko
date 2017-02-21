@@ -49,9 +49,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:support-v13:25.1.0'
-    compile 'tv.danmaku.ijk.media:ijkplayer-java:0.6.0'
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:support-v13:25.1.1'
+    compile ('tv.danmaku.ijk.media:ijkplayer-java:0.6.0') { exclude module: 'io.reactivex' }
     compile 'com.dou361.ijkplayer-armv7a:jjdxm-ijkplayer-armv7a:1.0.0'
 }
 

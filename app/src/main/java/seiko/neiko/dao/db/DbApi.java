@@ -6,10 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import seiko.neiko.app.App;
-import seiko.neiko.models.Book;;
+import seiko.neiko.models.Book;
 import seiko.neiko.models.ViewSetModel;
 import seiko.neiko.viewModels.BookViewModel;
 
@@ -260,13 +261,12 @@ public class DbApi {
         }
     }
 
-    public static void setNumber(String bkey, int number) {
-        db.updateSQL("UPDATE likes SET number=? WHERE bkey=?", number, bkey);
+    public static void setNumber(String url, int number) {
+        db.updateSQL("UPDATE likes SET number=? WHERE url=?", number, url);
     }
 
-    public static ArrayList<Book> getLike() {
-        ArrayList<Book> list = new ArrayList<>();
-
+    public static List<Book> getLikeS() {
+        List<Book> list = new ArrayList<>();
         DataReader dr = db.selectSQL("SELECT * FROM likes");
 
         while (dr.read()) {
@@ -276,30 +276,49 @@ public class DbApi {
             book.setUrl(dr.getString("url"));
             book.setType(dr.getInt("type"));
             book.setSource(dr.getString("source"));
-            book.setAuthor(dr.getString("author"));
-            book.setBkey(dr.getString("bkey"));
             book.setNumber(dr.getInt("number"));
             book.setNew(false);
-            getLikeBooks(book);
             list.add(0, book);
         }
-        dr.close();//内部同时关闭游标和数据库
-
         return list;
     }
 
-    /* 从book中获得收藏漫画的相关参数 */
-    private static void getLikeBooks(Book book) {
-        DataReader dr = db.selectSQL("SELECT * FROM books WHERE bkey=?;", book.getBkey());
-
-        while (dr.read()) {
-            book.setSection_count(dr.getInt("section_count"));
-            book.setLast_surl(dr.getString("last_surl"));
-            book.setLast_pidx(dr.getInt("last_pidx"));
-            book.setLast_page(dr.getInt("last_page"));
-        }
-        dr.close();//内部同时关闭游标和数据库
-    }
+//    public static List<Book> getLike() {
+//        List<Book> list = new ArrayList<>();
+//
+//        DataReader dr = db.selectSQL("SELECT * FROM likes");
+//
+//        while (dr.read()) {
+//            Book book = new Book();
+//            book.setName(dr.getString("name"));
+//            book.setLogo(dr.getString("logo"));
+//            book.setUrl(dr.getString("url"));
+//            book.setType(dr.getInt("type"));
+//            book.setSource(dr.getString("source"));
+//            book.setAuthor(dr.getString("author"));
+//            book.setBkey(dr.getString("bkey"));
+//            book.setNumber(dr.getInt("number"));
+//            book.setNew(false);
+//            getLikeBooks(book);
+//            list.add(0, book);
+//        }
+//        dr.close();//内部同时关闭游标和数据库
+//
+//        return list;
+//    }
+//
+//    /* 从book中获得收藏漫画的相关参数 */
+//    private static void getLikeBooks(Book book) {
+//        DataReader dr = db.selectSQL("SELECT * FROM books WHERE bkey=?;", book.getBkey());
+//
+//        while (dr.read()) {
+//            book.setSection_count(dr.getInt("section_count"));
+//            book.setLast_surl(dr.getString("last_surl"));
+//            book.setLast_pidx(dr.getInt("last_pidx"));
+//            book.setLast_page(dr.getInt("last_page"));
+//        }
+//        dr.close();//内部同时关闭游标和数据库
+//    }
 
     //==========================================
     /** history */
@@ -321,21 +340,19 @@ public class DbApi {
                 sd.dtype(),sd.bookKey,sd.bookUrl,sd.name,sd.logo,sd.author,sd.source, sdf.format(new Date()) );
     }
 
-    public static ArrayList<Book> getHistory() {
-        ArrayList<Book> list2 = new ArrayList<>();
+    public static List<Book> getHistory() {
+        List<Book> list2 = new ArrayList<>();
 
-        DataReader dr = db.selectSQL("SELECT * FROM historys ");
+        DataReader dr = db.selectSQL("SELECT * FROM historys");
 
         while (dr.read()) {
-            list2.add(0,new Book(
-                    dr.getString("name"),
-                    dr.getString("logo"),
-                    dr.getString("url"),
-                    dr.getInt("type"),
-                    dr.getString("source"),
-                    dr.getString("bkey")
-            ));
-
+            Book book = new Book();
+            book.setName(dr.getString("name"));
+            book.setLogo(dr.getString("logo"));
+            book.setUrl(dr.getString("url"));
+            book.setType(dr.getInt("type"));
+            book.setSource(dr.getString("source"));
+            list2.add(0, book);
         }
         dr.close();//内部同时关闭游标和数据库
 
