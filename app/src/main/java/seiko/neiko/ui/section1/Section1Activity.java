@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,12 +15,15 @@ import com.jakewharton.rxbinding.view.RxView;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import seiko.neiko.R;
 import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.dao.mTouch;
+import seiko.neiko.models.BookPage;
 import seiko.neiko.models.ViewSetModel;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
@@ -27,7 +31,6 @@ import seiko.neiko.app.ActivityBase;
 import seiko.neiko.dao.mReceiver;
 import seiko.neiko.utils.EncryptUtil;
 
-import static seiko.neiko.ui.section1.Section1FragmentBase.bookPages;
 import static seiko.neiko.ui.section1.Section1FragmentBase.bookUrl;
 import static seiko.neiko.ui.section1.Section1FragmentBase.dtype;
 import static seiko.neiko.ui.section1.Section1FragmentBase.imgList;
@@ -43,10 +46,6 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     TextView title;
     @BindView(R.id.seekbar)
     DiscreteSeekBar seekBar;
-    @BindView(R.id.section_battery)
-    TextView battery;
-    @BindView(R.id.section_time)
-    TextView time;
     @BindView(R.id.control)
     LinearLayout control;
     @BindView(R.id.section_back)
@@ -55,6 +54,8 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     private ViewSetModel viewSet;
     private mReceiver receiver;
     private RecyclerView recView;
+
+    public List<BookPage> bookPages;
 
     @Override
     protected void onResume() {
@@ -80,7 +81,7 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
                 break;
         }
         //加载电池、时间服务
-        receiver = new mReceiver(this, battery, time);
+        receiver = new mReceiver(this);
         //加载触摸手势
         initDetector();
         //seekBar拖动
@@ -108,6 +109,7 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     }
 
     private void setFragment(Section1FragmentBase fragment) {
+        fragment.attach(this);
         fragment.setSection1View(this);
         shiftView(fragment);
     }
@@ -249,5 +251,11 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
         receiver.unSub();
     }
 
+    //==============================================
+    /** 解析完成，关闭loadview */
+    public void readOk() {
+        TextView load = (TextView) findViewById(R.id.load);
+        load.setVisibility(View.GONE);
+    }
 
 }

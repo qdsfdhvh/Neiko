@@ -53,7 +53,8 @@ class MainSiteDViewHolder extends AbstractViewHolder<SourceModel> implements Sho
         tv.setText(model.title);
         if (!TextUtils.isEmpty(model.title)) {
             int color = ColorUtil.MATERIAL.getColor(model.title);
-            card.setBackgroundColor(color);
+            card.setCardBackgroundColor(color);
+            card.setRadius(5);
         }
 
         RxView.clicks(card).subscribe((Void aVoid) -> {

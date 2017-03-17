@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import seiko.neiko.R;
+
 /**
  * Created by Seiko on 2017/1/22. Y
  * 加载时间、电池服务
@@ -25,10 +27,10 @@ public class mReceiver {
     private TextView battery;
     private TextView time;
 
-    public mReceiver(Activity activity, TextView battery, TextView time) {
+    public mReceiver(Activity activity) {
         this.activity = activity;
-        this.battery = battery;
-        this.time = time;
+        this.battery = (TextView) activity.findViewById(R.id.section_battery);
+        this.time = (TextView) activity.findViewById(R.id.section_time);
         addReceiver();
     }
 

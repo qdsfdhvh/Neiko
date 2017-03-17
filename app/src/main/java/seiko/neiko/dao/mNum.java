@@ -27,6 +27,7 @@ public class mNum {
     /* home */
     public static final int HOTS_NUMBER = COUNT_TWO;
     public static final int TAGS_NUMBER = COUNT_THREE;
+    public static final int SEARCH_NUMBER = COUNT_TWO;
 
 
 

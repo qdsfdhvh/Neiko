@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -14,18 +12,19 @@ import seiko.neiko.app.SwipeLayoutBase;
 import seiko.neiko.models.SourceModel;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
-import static seiko.neiko.dao.mPath.sitedPath;
-
 /**
  * Created by Seiko on 2017/2/13. Y
  */
 
-public class SitedActivity extends SwipeLayoutBase {
+public class SitedActivity extends SwipeLayoutBase implements SitedView {
 
     @BindView(R.id.title)
     TextView mTitle;
     @BindView(R.id.recView)
     PracticalRecyclerView recView;
+
+    private SitedAdapter mAdapter;
+    private SitedPresenter mPresenter;
 
     @Override
     public int getLayoutId() {return R.layout.activity_sited;}
@@ -35,20 +34,33 @@ public class SitedActivity extends SwipeLayoutBase {
         super.onCreate(savedInstanceState);
         mTitle.setText("本地插件");
 
-        SiteDAdapter adapter = new SiteDAdapter();
+        mAdapter = new SitedAdapter();
+        mPresenter = new SitedPresenter();
+        mPresenter.attachView(this);
+
         recView.setLayoutManager(new LinearLayoutManager(this));
-        recView.setAdapterWithLoading(adapter);
+        recView.setAdapterWithLoading(mAdapter);
+        recView.setRefreshListener(() -> mPresenter.loadData());
 
-        List<SourceModel> list = new ArrayList<>();
+        mPresenter.loadData();
+    }
 
-        File file = new File(sitedPath);
+    //===============================================
+    /** 加载数据 */
+    @Override
+    public void onLoadSuccess(List<SourceModel> menu) {
+        mAdapter.clear();
+        mAdapter.addAll(menu);
+    }
 
-        for (File file1:file.listFiles()) {
-            SourceModel m = new SourceModel();
-            m.title = file1.getName();
-            list.add(m);
-        }
+    @Override
+    public void onLoadFailed() {
 
-        adapter.addAll(list);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.detachView();
     }
 }

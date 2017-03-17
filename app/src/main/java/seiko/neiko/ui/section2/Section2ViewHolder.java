@@ -1,5 +1,6 @@
 package seiko.neiko.ui.section2;
 
+import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +22,11 @@ import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
 class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
 
-    @BindView(R.id.section2_read_text)
+    @BindView(R.id.layout)
+    LinearLayout layout;
+    @BindView(R.id.tv)
     TextView tv;
-    @BindView(R.id.section_views)
+    @BindView(R.id.iv)
     ScaleImageView iv;
     @BindView(R.id.section2_read_button)
     LinearLayout bts;
@@ -42,6 +45,8 @@ class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
 
     @Override
     public void setData(TxtModel txt) {
+        tv.setTextColor(adapter.textColor);
+
         switch (txt.type) {
             default:
             case 1:
@@ -49,7 +54,7 @@ class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
                 iv.setVisibility(View.GONE);
                 tv.setVisibility(View.VISIBLE);
                 tv.getPaint().setFakeBoldText(false);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, adapter.getTextSize());
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, adapter.textSize);
                 tv.setText(String.valueOf("\u3000\u3000" + txt.data));
                 break;
             case 2:
@@ -57,7 +62,7 @@ class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
                 iv.setVisibility(View.GONE);
                 tv.setVisibility(View.VISIBLE);
                 tv.getPaint().setFakeBoldText(true);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, adapter.getTextSize() + 5);
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, adapter.textSize + 5);
                 tv.setText(String.valueOf("\n" + txt.data));
                 break;
             case 9:
@@ -68,7 +73,7 @@ class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
                 ImageLoader.getDefault().display9(itemView, iv, txt.data, null);
                 break;
         }
-        if (getAdapterPosition() == adapter.getItemCount() - 1 && adapter.getDtype() == 2) {
+        if (getAdapterPosition() == adapter.getItemCount() - 1 && adapter.dtype == 2) {
             bts.setVisibility(View.VISIBLE);
             bt1.setOnClickListener((View v) -> adapter.getMbtClick().onItemClick(1));
             bt2.setOnClickListener((View v) -> adapter.getMbtClick().onItemClick(-1));

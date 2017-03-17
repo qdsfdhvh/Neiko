@@ -40,7 +40,6 @@ public class MainViewModel extends ViewModelBase implements ISdViewModel {
     public void loadByConfig(SdNode config) {
         if (DdSource.isHots(config)) {
             hotList.clear();
-//            config.items().forEach((SdNode t1) -> hotList.add(new Book(t1.title, t1.logo, t1.url)));
             for (SdNode t1 : config.items()) {
                 hotList.add(new Book(t1.title, t1.logo, t1.url));
             }
@@ -48,7 +47,6 @@ public class MainViewModel extends ViewModelBase implements ISdViewModel {
 
         if (DdSource.isTags(config)) {
             tagList.clear();
-//            config.items().forEach((SdNode t1) -> tagList.add(new Book(t1.title, t1.url)));
             for (SdNode t1 : config.items()) {
                 tagList.add(new Book(t1.title, t1.url));
             }
@@ -68,7 +66,12 @@ public class MainViewModel extends ViewModelBase implements ISdViewModel {
     }
 
     private void loadByJsonData(SdNode config, String json) {
-        JsonArray data = new JsonParser().parse(json).getAsJsonArray();
+        JsonElement element = new JsonParser().parse(json);
+
+        if (!element.isJsonArray())
+            return;
+
+        JsonArray data = element.getAsJsonArray();
 
         if (DdSource.isHots(config)) {
             for (JsonElement el:data) {

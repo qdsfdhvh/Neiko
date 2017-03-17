@@ -10,6 +10,7 @@ import zlc.season.practicalrecyclerview.AbstractAdapter;
  */
 
 class MainLikeAdapter extends AbstractAdapter<Book, MainLikeViewHolder> {
+
     @Override
     protected MainLikeViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {
         return new MainLikeViewHolder(parent, this);

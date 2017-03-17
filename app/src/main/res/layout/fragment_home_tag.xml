@@ -6,15 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recView_tag"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:paddingStart="3dp"
-        android:paddingEnd="3dp"
-        android:clipToPadding="false"
-        tools:listitem="@layout/fragment_home_tag" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recView_tag"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:clipToPadding="false"
+            tools:listitem="@layout/fragment_home_tag" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

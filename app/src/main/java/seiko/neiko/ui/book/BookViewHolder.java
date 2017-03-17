@@ -2,6 +2,7 @@ package seiko.neiko.ui.book;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +28,9 @@ class BookViewHolder extends AbstractViewHolder<Book> {
     @BindView(R.id.book_sections2)
     TextView tv2;
     @BindView(R.id.sections_view1)
-    View sections_view1;
+    CardView card;
     @BindView(R.id.sections_view2)
     View sections_view2;
-    @BindView(R.id.sections_linearlayout)
-    View sections_focus;
 
     private Context mContext;
     private BookAdapter adapter;
@@ -54,21 +53,20 @@ class BookViewHolder extends AbstractViewHolder<Book> {
         String Sec = book.getSection().replaceAll("\n","");
 
         if (TextUtils.isEmpty(url)) {
-            sections_view1.setVisibility(View.GONE);
+            card.setVisibility(View.GONE);
             sections_view2.setVisibility(View.VISIBLE);
             tv2.setText(Sec);
             tv2.getPaint().setFakeBoldText(true);
         } else {
             sections_view2.setVisibility(View.GONE);
-            sections_view1.setVisibility(View.VISIBLE);
+            card.setVisibility(View.VISIBLE);
             tv1.setText(Sec);
             tv1.getPaint().setFakeBoldText(false);
 
-            if (url.equals(adapter.last_surl)) {
-                sections_focus.setBackgroundColor(Color.parseColor("#1abc9c"));
-            } else {
-                sections_focus.setBackgroundColor(Color.parseColor("#FFFFFF"));
-            }
+            if (url.equals(adapter.last_surl))
+                card.setCardBackgroundColor(Color.parseColor("#1abc9c"));
+            else
+                card.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
         }
     }
 

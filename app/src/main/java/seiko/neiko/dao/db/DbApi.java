@@ -215,8 +215,8 @@ public class DbApi {
 
     //==================================
     /** likes */
-    public static void delLike(String bkey) {
-        db.updateSQL("DELETE FROM likes WHERE bkey=?", bkey);
+    public static void delLike(String url) {
+        db.updateSQL("DELETE FROM likes WHERE url=?", url);
     }
 
 //    public static void addLike(BookViewModel sd) {
@@ -234,7 +234,7 @@ public class DbApi {
 
     //备份用
     public static void addLike(Book book) {
-        if (!db.existsSQL("SELECT * FROM likes WHERE bkey=?", book.getBkey())) {
+        if (!db.existsSQL("SELECT * FROM likes WHERE url=?", book.getUrl())) {
 //            Log.d("addLike","添加："+book.getBkey());
             db.updateSQL("INSERT INTO likes(type,bkey,url,name,logo,author,source,number,logTime) VALUES(?,?,?,?,?,?,?,?,?);",
                     book.getType(), book.getBkey(), book.getUrl(), book.getName(), book.getLogo(),
@@ -247,7 +247,7 @@ public class DbApi {
         }
 
         if (book.isref()) {
-            if(!db.existsSQL("SELECT * FROM books WHERE bkey=?", book.getBkey())) {
+            if(!db.existsSQL("SELECT * FROM books WHERE url=?", book.getUrl())) {
 //                Log.d("addBook","添加："+book.getBkey());
                 db.updateSQL("INSERT INTO books(bkey, url, section_count, last_surl, last_pidx, last_page, source) VALUES(?,?,?,?,?,?,?);",
                         book.getBkey(), book.getUrl(), book.getSection_count(),
@@ -401,5 +401,25 @@ public class DbApi {
 
     public static void setCutPic(int i) {
         db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "CutPic");
+    }
+
+    public static int getTextTheme() {
+        if (!db.existsSQL("SELECT setData FROM setting WHERE setName=?", "TextTheme")) {
+            db.updateSQL("INSERT INTO setting(setName, setData) VALUES(?,?)", "TextTheme", 0);
+            return 0;
+        }
+
+        int CutPic = 0;
+        DataReader dr = db.selectSQL("SELECT setData FROM setting WHERE setName=?", "TextTheme");
+        if (dr.read()) {
+            CutPic = dr.getInt("setData");
+        }
+        dr.close();
+
+        return CutPic;
+    }
+
+    public static void setTextTheme(int i) {
+        db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "TextTheme");
     }
 }

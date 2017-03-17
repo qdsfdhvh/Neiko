@@ -1,7 +1,6 @@
 package org.noear.sited;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.Releasable;
@@ -28,17 +27,15 @@ class JsEngine {
         this.source = sd;
         this.engine = V8.createV8Runtime(null, app.getApplicationInfo().dataDir);
 
-        JavaVoidCallback callback = new JavaVoidCallback() {
-            public void invoke(final V8Object receiver, final V8Array parameters) {
-                if (parameters.length() > 0) {
-                    Object arg1 = parameters.get(0);
+        JavaVoidCallback callback = (final V8Object receiver, final V8Array parameters) -> {
+            if (parameters.length() > 0) {
+                Object arg1 = parameters.get(0);
 
-                    Util.log(source, "JsEngine.print", (String) arg1);
+                Util.log(source, "JsEngine.print", (String) arg1);
 
 
-                    if (arg1 instanceof Releasable) {
-                        ((Releasable) arg1).release();
-                    }
+                if (arg1 instanceof Releasable) {
+                    ((Releasable) arg1).release();
                 }
             }
         };
@@ -56,7 +53,6 @@ class JsEngine {
     }
 
     public synchronized JsEngine loadJs(String funs) {
-
         try {
             engine.executeVoidScript(funs);//预加载了批函数
         } catch (Exception ex) {
@@ -64,7 +60,6 @@ class JsEngine {
             Util.log(source, "JsEngine.loadJs", ex.getMessage(), ex);
             throw ex;
         }
-
         return this;
     }
 

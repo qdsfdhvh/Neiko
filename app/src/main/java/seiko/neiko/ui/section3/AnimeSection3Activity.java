@@ -1,10 +1,8 @@
 package seiko.neiko.ui.section3;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import com.dou361.ijkplayer.bean.VideoijkBean;
@@ -90,12 +88,7 @@ public class AnimeSection3Activity extends ActivityBase {
     private void isNull() {
         new AlertDialog.Builder(this)
                 .setMessage("解析错误")
-                .setNegativeButton("浏览器打开", (DialogInterface dif, int j) -> {
-                    final Uri uri = Uri.parse(m.url);
-                    final Intent it = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(it);
-                    finish();
-                })      //通知中间按钮
+                .setNegativeButton("浏览器打开", (DialogInterface dif, int j) -> mIntent.Intent_Web(this, m.url))
                 .setPositiveButton("关闭", (DialogInterface dif, int j) -> {
                     dif.dismiss();
                     finish();

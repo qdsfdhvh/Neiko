@@ -16,16 +16,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.lid.lib.LabelImageView
-            android:id="@+id/logo"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/app_name"
-            app:label_backgroundColor="#03A9F4"
-            app:label_distance="20dp"
-            app:label_textSize="8sp"
-            app:label_height="15sp"/>
+        <seiko.neiko.widget.ScaleImageView
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name"
+        app:label_backgroundColor="#03A9F4"
+        app:label_distance="20dp"
+        app:label_textSize="8sp"
+        app:label_height="15sp"/>
 
         <TextView
             android:id="@+id/title"

@@ -18,13 +18,6 @@
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="20dp">
 
-        <LinearLayout
-            android:id="@+id/sections_linearlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:orientation="vertical">
-
             <!--章节名称-->
             <TextView
                 android:id="@+id/book_sections1"
@@ -38,10 +31,7 @@
                 android:maxLines="1"
                 android:textSize="14sp" />
 
-        </LinearLayout>
-
     </android.support.v7.widget.CardView>
-
 
     <LinearLayout
         android:id="@+id/sections_view2"

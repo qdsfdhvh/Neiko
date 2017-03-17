@@ -1,12 +1,18 @@
 package seiko.neiko.ui.section2;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -16,10 +22,12 @@ import com.jakewharton.rxbinding.view.RxView;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 import org.noear.sited.SdNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rx.functions.Action1;
 import seiko.neiko.R;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.dao.mTouch;
@@ -32,6 +40,7 @@ import seiko.neiko.utils.EncryptUtil;
 import seiko.neiko.utils.HintUtil;
 import seiko.neiko.viewModels.Section2ViewModel;
 import seiko.neiko.app.ActivityBase;
+import seiko.neiko.widget.TextDrawable;
 
 /**
  * Created by Seiko on 2017/1/22. Y
@@ -45,10 +54,6 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     RecyclerView recView;
     @BindView(R.id.seekbar)
     DiscreteSeekBar seekBar;
-    @BindView(R.id.section_battery)
-    TextView battery;
-    @BindView(R.id.section_time)
-    TextView time;
     @BindView(R.id.control)
     LinearLayout control;
     @BindView(R.id.section_back)
@@ -107,12 +112,12 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
 
         viewModel = new Section2ViewModel(m.sec_url);
         //加载电池、时间服务
-        receiver = new mReceiver(this, battery, time);
+        receiver = new mReceiver(this);
     }
 
     private void setRecView() {
         adapter = new Section2Adapter();
-        adapter.setDtype(m.dtype);
+        adapter.dtype = m.dtype;
         adapter.setbtClickListener(this);
         llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -139,6 +144,7 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
                 initRec(viewModel.items, loadsave);
             }
         });
+
         nowload = false;
     }
 
@@ -264,21 +270,23 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     LinearLayout setting;
     @BindView(R.id.textSize)
     DiscreteSeekBar textSize;
+    @BindView(R.id.textTheme)
+    LinearLayout textTheme;
 
     /* 显示&隐藏设置 */
     @OnClick(R.id.change_setting)
     void change_setting() {changeVisible(setting);}
 
     private void setTextSize() {
-        adapter.setTextSize(DbApi.getTextSize());
+        adapter.textSize = DbApi.getTextSize();
 
         textSize.setMax(30);
         textSize.setMin(10);
-        textSize.setProgress(adapter.getTextSize());
+        textSize.setProgress(adapter.textSize);
         textSize.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int i, boolean fromUser) {
-                adapter.setTextSize(i);
+                adapter.textSize = i;
                 adapter.notifyDataSetChanged();
             }
 
@@ -287,9 +295,52 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
 
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-                DbApi.setTextSize(adapter.getTextSize()); //保存字体大小
+                DbApi.setTextSize(adapter.textSize); //保存字体大小
             }
         });
+
+        List<String[]> theme = new ArrayList<>();
+        String[] b0 = {"A", "#000000", "#f8f8f8"};
+        String[] b1 = {"B", "#383129", "#cdc9be"};
+        String[] b2 = {"C", "#a19e99", "#3a3531"};
+        String[] b3 = {"D", "#333331", "#ccebcc"};
+        theme.add(b0);
+        theme.add(b1);
+        theme.add(b2);
+        theme.add(b3);
+
+        int num = DbApi.getTextTheme();
+        setTheme(theme.get(num));
+
+        for (int i=0;i<theme.size();i++) {
+            addButton(i, theme.get(i));
+        }
+    }
+
+    private void addButton(int i, String[] bg) {
+        Button bt = new Button(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(100, 100);
+        lp.leftMargin = 50;
+
+        TextDrawable drawable = TextDrawable.builder()
+                .beginConfig()
+                .textColor(Color.parseColor(bg[1]))
+                .fontSize(30)
+                .endConfig()
+                .buildRound(bg[0], Color.parseColor(bg[2]));
+        bt.setBackground(drawable);
+
+        RxView.clicks(bt).subscribe((Void aVoid) -> {
+            setTheme(bg);
+            DbApi.setTextTheme(i);
+        });
+        textTheme.addView(bt, lp);
+    }
+
+    private void setTheme(String[] bg) {
+        recView.setBackgroundColor(Color.parseColor(bg[2]));
+        adapter.textColor = Color.parseColor(bg[1]);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

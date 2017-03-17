@@ -20,11 +20,8 @@ import android.widget.Toast;
 import java.util.List;
 
 import butterknife.ButterKnife;
-//import rx.functions.Action1;
-//import io.reactivex.functions.Action;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-//import rx.subscriptions.CompositeSubscription;
 import io.reactivex.disposables.CompositeDisposable;
 import seiko.neiko.R;
 import seiko.neiko.dao.Permission;
@@ -40,7 +37,7 @@ import seiko.neiko.view.BaseView;
  */
 
 public abstract class ActivityBase extends FragmentActivity implements BaseView {
-    /** 贯穿全部 */
+
     protected static DdSource source;
     private CompositeDisposable compositeDisposable;
 
@@ -84,8 +81,32 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
-            window.setNavigationBarColor(Color.TRANSPARENT);
+//            window.setNavigationBarColor(Color.TRANSPARENT);
         }
+    }
+
+    //====================================================================
+    /** 全屏 */
+    public void setImmersiveFullscreen(boolean isFullscreen) {
+        Window window = getWindow();
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        int uiOpts;
+
+        if (isFullscreen) {
+            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        } else {
+            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        }
+
+        window.getDecorView().setSystemUiVisibility(uiOpts);
     }
 
 
@@ -159,31 +180,6 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
         else
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    //====================================================================
-    /** 全屏 */
-    public void setImmersiveFullscreen(boolean isFullscreen) {
-        Window window = getWindow();
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-        int uiOpts;
-
-        if (isFullscreen) {
-            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-        } else {
-            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-        }
-
-        window.getDecorView().setSystemUiVisibility(uiOpts);
     }
 
     //====================================================================

@@ -4,21 +4,18 @@ import android.view.ViewGroup;
 
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.models.Book;
+import seiko.neiko.ui.book.BookModel;
 import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 /**
  * Created by Seiko on 2016/12/21. Y
  */
 
-class SearchAdapter extends AbstractAdapter<Book, SearchViewHolder> {
-
-    DdSource source;
-
-    SearchAdapter(DdSource source) {this.source = source;}
+class SearchAdapter extends AbstractAdapter<BookModel, SearchViewHolder> {
 
     @Override
     protected SearchViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SearchViewHolder(parent, this);
+        return new SearchViewHolder(parent);
     }
 
     @Override

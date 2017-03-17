@@ -15,7 +15,7 @@ public class HintUtil {
         final Toast toast= Toast.makeText(App.getContext(), msg, Toast.LENGTH_SHORT);
 
         toast.show();
-        new Handler().postDelayed(() -> toast.cancel(), 500);
+        new Handler().postDelayed(() -> toast.cancel(), 1000);
     }
 
 }

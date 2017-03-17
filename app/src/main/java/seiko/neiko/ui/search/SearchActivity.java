@@ -31,10 +31,10 @@ import seiko.neiko.viewModels.SearchViewModel;
 import seiko.neiko.app.SwipeLayoutBase;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
+import static seiko.neiko.dao.mNum.SEARCH_NUMBER;
 import static seiko.neiko.dao.mPath.sitedPath;
 
-public class SearchActivity extends SwipeLayoutBase {
-    private static final int LIST_NUMBER = 2;
+public class SearchActivity extends SwipeLayoutBase implements FloatingSearchView.OnSearchListener {
 
     public static String key;
     public static boolean allSource;
@@ -54,7 +54,7 @@ public class SearchActivity extends SwipeLayoutBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRecView();
-        setSearchBar();
+        mSearchBar.setOnSearchListener(this);
         if (!TextUtils.isEmpty(key)) {
             DoLoadViewModel(source, key);
             mSearchBar.setSearchText(key);
@@ -62,8 +62,8 @@ public class SearchActivity extends SwipeLayoutBase {
     }
 
     private void setRecView() {
-        adapter = new SearchAdapter(source);
-        recView.setLayoutManager(new StaggeredGridLayoutManager(LIST_NUMBER, OrientationHelper.VERTICAL));
+        adapter = new SearchAdapter();
+        recView.setLayoutManager(new StaggeredGridLayoutManager(SEARCH_NUMBER, OrientationHelper.VERTICAL));
         recView.setHasFixedSize(true);
         if (allSource) {
             recView.setAdapterWithLoading(adapter);
@@ -73,15 +73,6 @@ public class SearchActivity extends SwipeLayoutBase {
         }
     }
 
-    private void setSearchBar() {
-        mSearchBar.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
-            @Override
-            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {}
-
-            @Override
-            public void onSearchAction(String key) {isallSource(key, allSource);}
-        });
-    }
 
     //=================================
     /** 是否为多插件搜索 */
@@ -110,13 +101,10 @@ public class SearchActivity extends SwipeLayoutBase {
                 .delay(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String name) throws Exception {
-                        DdSource source = SourceApi.getDefault().getByTitle(name);
-                        if (source != null) {
-                            DoLoadViewModel(source, key);
-                        }
+                .subscribe((String name) -> {
+                    DdSource source = SourceApi.getDefault().getByTitle(name);
+                    if (source != null) {
+                        DoLoadViewModel(source, key);
                     }
                 });
     }
@@ -128,13 +116,16 @@ public class SearchActivity extends SwipeLayoutBase {
         viewModel.clear();
         source.getNodeViewModel(viewModel, false, key, 1, source.search, (code) -> {
             if (code == 1) {
-                int size = adapter.getDataSize();
-                if (size == 0)
-                    adapter.addAll(viewModel.mDatas);
-                else
-                    adapter.insertAllBack(size - 1, viewModel.mDatas);
+                adapter.addAll(viewModel.list);
             }
         });
     }
 
+    //=================================
+    /** 搜索 */
+    @Override
+    public void onSuggestionClicked(SearchSuggestion searchSuggestion) {}
+
+    @Override
+    public void onSearchAction(String key) {isallSource(key, allSource);}
 }

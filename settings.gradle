@@ -1,3 +1,4 @@
 include ':app'
 include ':libs:sited'
 include ':libs:jjdxm-ijkplayer'
+include ':libs:practicalrecyclerview'

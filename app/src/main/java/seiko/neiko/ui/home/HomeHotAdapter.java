@@ -14,8 +14,8 @@ import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 class HomeHotAdapter extends AbstractAdapter<Book, HomeHotViewHolder> {
 
-    DdSource source;
-    String refererUrl;
+    private DdSource source;
+    private String refererUrl;
 
     HomeHotAdapter(DdSource source, String refererUrl) {
         this.source = source;
@@ -32,4 +32,9 @@ class HomeHotAdapter extends AbstractAdapter<Book, HomeHotViewHolder> {
         holder.setData(get(position));
     }
 
+    int Dtype(String url) {return source.book(url).dtype();}
+
+    boolean isTag(String url) {return source.tag(url).isMatch(url);}
+
+    String ref() {return refererUrl;}
 }

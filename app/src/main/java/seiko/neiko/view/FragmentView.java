@@ -7,4 +7,5 @@ package seiko.neiko.view;
 public interface FragmentView extends BaseView {
 
     void initView();
+
 }

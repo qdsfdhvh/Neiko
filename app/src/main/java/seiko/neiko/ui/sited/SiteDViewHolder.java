@@ -21,16 +21,16 @@ import zlc.season.practicalrecyclerview.AbstractViewHolder;
  * Created by Seiko on 2017/2/13. Y
  */
 
-class SiteDViewHolder extends AbstractViewHolder<SourceModel> {
+class SitedViewHolder extends AbstractViewHolder<SourceModel> {
 
     @BindView(R.id.title)
     TextView tv;
 
     private SourceModel m;
     private Context mContext;
-    private SiteDAdapter adapter;
+    private SitedAdapter adapter;
 
-    SiteDViewHolder(ViewGroup parent, SiteDAdapter adapter) {
+    SitedViewHolder(ViewGroup parent, SitedAdapter adapter) {
         super(parent, R.layout.item_sited);
         ButterKnife.bind(this, itemView);
         this.adapter = adapter;

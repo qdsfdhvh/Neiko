@@ -32,6 +32,8 @@ import seiko.neiko.dao.SourceApi;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.dao.mPath;
 import seiko.neiko.models.SourceModel;
+import seiko.neiko.rx.RxBus;
+import seiko.neiko.rx.RxEvent;
 import seiko.neiko.ui.CacheActivity;
 import seiko.neiko.app.ActivityBase;
 import seiko.neiko.ui.sited.SitedActivity;
@@ -59,7 +61,6 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     /** 页面集合 */
     private List<Fragment> fragmentList;
     private boolean flag = false;
-    private MainSiteDFragment mainsiteDFragment;
 
     @Override
     public int getLayoutId() {return R.layout.activity_main;}
@@ -68,8 +69,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentList = new ArrayList<>();
-        mainsiteDFragment = new MainSiteDFragment();
-        fragmentList.add(mainsiteDFragment);
+        fragmentList.add(new MainSiteDFragment());
         fragmentList.add(new MainLikeFragment());
         fragmentList.add(new MainHistFragment());
 
@@ -101,7 +101,6 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
         }
     }
 
-
     /** 监听滑动菜单 */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -132,11 +131,10 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     /* 设置按钮 */
     @OnClick(R.id.nav_set)
     void nav_set() {
-        if (flag) {
+        if (flag)
             mLayout.closeDrawers();
-        } else {
+        else
             mLayout.openDrawer(GravityCompat.START);
-        }
     }
 
     /* 搜索按钮 */
@@ -153,9 +151,9 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
      */
     private class MyFragStatePagerAdapter extends FragmentStatePagerAdapter {
 
-        String[] pagers = new String[]{"主页", "收藏",  "历史"};
+        private String[] pagers = new String[]{"主页", "收藏", "历史"};
 
-        MyFragStatePagerAdapter(FragmentManager fm) {super(fm);}
+        private MyFragStatePagerAdapter(FragmentManager fm) {super(fm);}
 
         @Override
         public Fragment getItem(int position) {return fragmentList.get(position);}
@@ -165,7 +163,6 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
 
         @Override
         public CharSequence getPageTitle(int position) {return pagers[position];}
-
     }
 
     /** 安装sited插件操作 */
@@ -237,7 +234,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
             SourceModel m = new SourceModel();
             m.title = sd.title;
             m.url = sd.url;
-            mainsiteDFragment.addSiteD(m);
+            RxBus.getDefault().post(new RxEvent(RxEvent.EVENT_MAIN_SITED, m));
             FileUtil.saveText2Sdcard(mPath.getSitedPath(sd.title), s);
         }
     }

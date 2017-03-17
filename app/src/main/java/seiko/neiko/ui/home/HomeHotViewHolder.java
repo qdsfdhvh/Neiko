@@ -29,7 +29,7 @@ class HomeHotViewHolder extends AbstractViewHolder<Book> {
     private Book book;
 
     HomeHotViewHolder(ViewGroup parent, HomeHotAdapter adapter) {
-        super(parent, R.layout.item_main);
+        super(parent, R.layout.item_home_hot);
         ButterKnife.bind(this, itemView);
         this.mContext = parent.getContext();
         this.adapter = adapter;
@@ -39,14 +39,14 @@ class HomeHotViewHolder extends AbstractViewHolder<Book> {
     public void setData(Book book) {
         this.book = book;
         tv.setText(book.getName());
-        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), book.getName(), adapter.refererUrl);
+        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), book.getName(), adapter.ref());
         iv.requestLayout();
     }
 
     @OnClick(R.id.layout)
     void OnClick() {
-        int dtype = adapter.source.book(book.getUrl()).dtype();
-        boolean isTag = adapter.source.tag(book.getUrl()).isMatch(book.getUrl());
+        int dtype = adapter.Dtype(book.getUrl());
+        boolean isTag = adapter.isTag(book.getUrl());
         mIntent.Intent_Home_Hot(mContext, book, dtype, isTag);
     }
 

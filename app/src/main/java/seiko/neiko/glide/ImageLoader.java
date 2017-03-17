@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -117,7 +118,7 @@ public class ImageLoader {
         private float ratio;
 
         DriverViewTarget(View v, ScaleImageView view) {
-            layout = (LinearLayout) v.findViewById(R.id.section_linear);
+            layout = (LinearLayout) v.findViewById(R.id.layout);
             this.iv = view;
         }
 
@@ -135,7 +136,7 @@ public class ImageLoader {
 
         /** 处理：普通或者需要对半切的图片 */
         private float isOrdImg(Bitmap bitmap, ScaleImageView iv1) {
-//            Log.d(TAG, "width=" + width + ";height=" + height + ";ratio=" + ratio);
+            Log.d(TAG, "width=" + width + ";height=" + height + ";ratio=" + ratio);
             switch (cut_pic) {
                 case 0:
                     iv1.setInitSize(width, height);
@@ -143,7 +144,7 @@ public class ImageLoader {
                     break;
                 case 1:
                 case 2:
-                    if (width < 1000 || ratio < 1.15 || ratio >1.66 || width > 2000) {
+                    if (width < 900 || ratio < 1.15 || ratio >1.66 || width > 2000) {
                         iv1.setInitSize(width, height);
                         iv1.setImageBitmap(bitmap);
                     } else {
@@ -239,7 +240,7 @@ public class ImageLoader {
 
         return TextDrawable.builder()
                 .beginConfig()
-                .fontSize(65)
+                .fontSize(55)
                 .bold()
                 .textColor(Color.WHITE)
                 .endConfig()

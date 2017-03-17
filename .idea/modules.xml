@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/jjdxm-ijkplayer/jjdxm-ijkplayer.iml" filepath="$PROJECT_DIR$/libs/jjdxm-ijkplayer/jjdxm-ijkplayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/libs.iml" filepath="$PROJECT_DIR$/libs/libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/practicalrecyclerview/practicalrecyclerview.iml" filepath="$PROJECT_DIR$/libs/practicalrecyclerview/practicalrecyclerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/sited/sited.iml" filepath="$PROJECT_DIR$/libs/sited/sited.iml" />
     </modules>
   </component>

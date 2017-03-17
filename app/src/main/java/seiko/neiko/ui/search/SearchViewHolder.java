@@ -8,12 +8,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import seiko.neiko.R;
-import seiko.neiko.dao.SourceApi;
-import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.glide.ImageLoader;
-import seiko.neiko.models.Book;
-import seiko.neiko.utils.HintUtil;
+import seiko.neiko.ui.book.BookModel;
 import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
@@ -23,42 +20,31 @@ import static seiko.neiko.dao.engine.DdApi.setLabelText;
  * Created by Seiko on 2016/12/21. Y
  */
 
-class SearchViewHolder extends AbstractViewHolder<Book> {
+class SearchViewHolder extends AbstractViewHolder<BookModel> {
     @BindView(R.id.logo)
     ScaleImageView iv;
     @BindView(R.id.title)
     TextView tv;
 
     private Context mContext;
-    private Book book;
-    private SearchAdapter adapter;
+    private BookModel book;
 
-    SearchViewHolder(ViewGroup parent, SearchAdapter adapter) {
-        super(parent, R.layout.item_main);
+    SearchViewHolder(ViewGroup parent) {
+        super(parent, R.layout.item_home_hot);
         ButterKnife.bind(this, itemView);
         this.mContext = parent.getContext();
-        this.adapter = adapter;
     }
 
     @Override
-    public void setData(Book book) {
+    public void setData(BookModel book) {
         this.book = book;
-        tv.setText(book.getName());
-        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), book.getName());
-        setLabelText(book.getSource(), book.getType(), iv);
+        tv.setText(book.name);
+        ImageLoader.getDefault().display(mContext, iv, book.logo, book.name);
+        setLabelText(book.source, book.dtype, iv);
     }
 
     @OnClick(R.id.layout)
     void OnClick() {
-        DdSource source = SourceApi.getDefault().getByUrl(book.getUrl());
-        if (source != null) {
-            int dtype = source.book(book.getUrl()).dtype();
-            mIntent.Intent_Tag(mContext, book, dtype);
-        } else if (adapter.source != null) {
-            int dtype = adapter.source.getBody().dtype();
-            mIntent.Intent_Tag(mContext, book, dtype);
-        } else {
-            HintUtil.show("未获得相关插件参数");
-        }
+        mIntent.Intent_Tag(mContext, book);
     }
 }

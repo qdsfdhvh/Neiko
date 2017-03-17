@@ -1,7 +1,9 @@
 package seiko.neiko.ui.tag;
 
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import butterknife.BindView;
@@ -22,12 +24,10 @@ class DialogTagPage {
     private AlertDialog alertDialog;
     private TagActivity activity;
 
-
-    DialogTagPage(View view, TagActivity activity, int page) {
+    private DialogTagPage(View view, TagActivity from, int page) {
         ButterKnife.bind(this, view);
-        this.activity = activity;
+        activity = from;
         et.setText(String.valueOf(page));
-
         alertDialog = new AlertDialog.Builder(view.getContext())
                 .setView(view)
                 .setCancelable(true)
@@ -35,10 +35,13 @@ class DialogTagPage {
         alertDialog.show();
     }
 
+    static void create(TagActivity from, int page) {
+        View view = LayoutInflater.from(from).inflate(R.layout.dialog_button, (ViewGroup) from.findViewById(R.id.dialog));
+        new DialogTagPage(view, from, page);
+    }
 
     @OnClick(R.id.center)
     void OnPage() {
-
         String input = et.getText().toString();
         if (input.equals("")) {
             HintUtil.show("页数不能为空！");

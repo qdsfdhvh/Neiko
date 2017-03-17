@@ -7,6 +7,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lid.lib.LabelImageView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -28,7 +30,7 @@ import static seiko.neiko.dao.engine.DdApi.setLabelText;
 
 class MainLikeViewHolder extends AbstractViewHolder<Book> {
     @BindView(R.id.logo)
-    ScaleImageView iv;
+    LabelImageView iv;
     @BindView(R.id.title)
     TextView tv;
 
@@ -47,8 +49,7 @@ class MainLikeViewHolder extends AbstractViewHolder<Book> {
     public void setData(Book book) {
         this.book = book;
         tv.setText(book.getName());
-
-        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), book.getName());
+        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), book.getName(), book.getUrl());
         if (book.isNew()) {
             iv.setLabelText("new");
             iv.setLabelBackgroundColor(Color.parseColor("#F44336"));
@@ -79,7 +80,7 @@ class MainLikeViewHolder extends AbstractViewHolder<Book> {
     }
 
     private void del_like() {
-        DbApi.delLike(book.getBkey());               //数据库中删除漫画
+        DbApi.delLike(book.getUrl());                //数据库中删除漫画
         HintUtil.show(book.getName() + "：已删除");   //通知
         adapter.remove(getAdapterPosition());        //删除界面和list中的插件数据
     }

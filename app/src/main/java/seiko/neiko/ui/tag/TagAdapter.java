@@ -3,17 +3,14 @@ package seiko.neiko.ui.tag;
 import android.view.ViewGroup;
 
 import seiko.neiko.dao.engine.DdSource;
-import seiko.neiko.models.Book;
+import seiko.neiko.ui.book.BookModel;
 import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 /**
  * Created by Seiko on 2016/12/20. Y
  */
 
-class TagAdapter extends AbstractAdapter<Book, TagViewHolder> {
-    DdSource source;
-
-    TagAdapter(DdSource source) {this.source = source;}
+class TagAdapter extends AbstractAdapter<BookModel, TagViewHolder> {
 
     @Override
     protected TagViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {

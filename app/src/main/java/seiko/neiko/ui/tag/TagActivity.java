@@ -2,16 +2,15 @@ package seiko.neiko.ui.tag;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import seiko.neiko.R;
-import seiko.neiko.viewModels.TagViewModel;
 import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.ui.book.BookModel;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
@@ -19,7 +18,7 @@ import zlc.season.practicalrecyclerview.PracticalRecyclerView;
  * Created by Seiko on 2016/9/10.YiKu
  */
 
-public class TagActivity extends SwipeLayoutBase {
+public class TagActivity extends SwipeLayoutBase implements TagView {
 
     public static TagModel m;
 
@@ -31,8 +30,8 @@ public class TagActivity extends SwipeLayoutBase {
     @BindView(R.id.title)
     TextView mTitle;
 
-    private TagViewModel viewModel;
-    private TagAdapter adapter;
+    private TagAdapter mAdapter;
+    private TagPresenter mPresenter;
 
     @Override
     public int getLayoutId() {return R.layout.activity_tag;}
@@ -40,65 +39,54 @@ public class TagActivity extends SwipeLayoutBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new TagViewModel();
         mTitle.setText(m.tagName);
-        setRecView();
-        DoLoadViewModel(false);
-    }
 
-    /** 加载列表 */
-    private void setRecView() {
-        adapter = new TagAdapter(source);
+        mAdapter = new TagAdapter();
+        mPresenter = new TagPresenter(source, m.tagUrl);
+        mPresenter.attachView(this);
+
         recView.setLayoutManager(new LinearLayoutManager(this));
         recView.setHasFixedSize(true);
-        recView.setAdapterWithLoading(adapter);
-        fastScroller.setRecyclerView(recView.get());
+        recView.setAdapterWithLoading(mAdapter);
 
+        fastScroller.setRecyclerView(recView.get());
         recView.get().addOnScrollListener(fastScroller.getOnScrollListener());
-        recView.setLoadMoreListener(() -> {
-            viewModel.currentPage += 1;
-            DoLoadViewModel(true);
-        });
+        recView.setLoadMoreListener(() -> mPresenter.loadData(false));
+
+        mPresenter.loadData(true);
     }
 
     //===============================================
     /** 加载数据 */
-    public void DoLoadViewModel(int page) {
-        viewModel.currentPage = page;
-        adapter.clear();
-        adapter.notifyDataSetChanged();
-        adapter.showLoading();
-
-        DoLoadViewModel(false);
+    @Override
+    public void onLoadSuccess(List<BookModel> list) {
+        mTitle.setText(m.tagName + " 第" + mPresenter.getPage() + "页");
+        mAdapter.addAll(list);
     }
 
-    private void DoLoadViewModel(boolean isAdd) {
-        source.getNodeViewModel(viewModel, false, viewModel.currentPage, m.tagUrl, source.tag(m.tagUrl), (code) -> {
-            if (code == 1) {
-                mTitle.setText(m.tagName + " " + viewModel.currentPage + "页");
-                if (isAdd) {
-                    adapter.insertAllBack(adapter.getDataSize() - 1, viewModel.mDatas);
-                }else {
-                    adapter.addAll(viewModel.mDatas);
-                }
-            } else {
-                toast("加载失败");
-            }
-        });
+    @Override
+    public void onLoadFailed() {mAdapter.showError();}
+
+    //===============================================
+    /** Dialog刷新数据 */
+    void DoLoadViewModel(int page) {
+        mAdapter.clear();
+        mAdapter.notifyDataSetChanged();
+        mAdapter.showLoading();
+
+        mPresenter.loadData(page);
     }
 
     //===============================================
     /** 标题按钮 */
     @OnClick(R.id.title)
-    void OnTitle() {
-        LayoutInflater inflater = getLayoutInflater();
-        View dialog = inflater.inflate(R.layout.dialog_button, (ViewGroup) findViewById(R.id.dialog));
-        new DialogTagPage(dialog, this, viewModel.currentPage);
-    }
+    void OnTitle() {DialogTagPage.create(this, mPresenter.getPage());}
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mPresenter.detachView();
         m = null;
     }
+
 }

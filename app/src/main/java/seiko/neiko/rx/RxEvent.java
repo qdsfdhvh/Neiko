@@ -11,7 +11,7 @@ public class RxEvent {
     public static final int EVENT_MAIN_HIST = 13;
 
     public static final int EVENT_COPY_SITED = 991;
-    public static final int EVENT_COPY_LIKE  = 992;
+//    public static final int EVENT_COPY_LIKE  = 992;
 
     public static final int EVENT_DOWN1_PROCESS = 41;
     public static final int EVENT_DOWN2_STATUS  = 42;

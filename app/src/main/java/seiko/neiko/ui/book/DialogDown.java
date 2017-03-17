@@ -51,20 +51,7 @@ class DialogDown {
         list = new ArrayList<>();
         path = getBookDownPath(viewModel.source, viewModel.name);
 
-//        Observable.from(viewModel.sectionList)
-//                .filter(new Func1<Book, Boolean>() {
-//                    @Override
-//                    public Boolean call(Book book) {
-//                        int state = DownDbApi.readDownedSectionState(book.getSection_url());
-//                        return (state == DownloadStatus.STATE_NONE);
-//                    }
-//                })
-//                .subscribe(new Action1<Book>() {
-//                    @Override
-//                    public void call(Book book) {
-//                        Log.d("DialogDown", book.getSection());
-//                    }
-//                });
+
 
         for (Book book: viewModel.sectionList) {
             DownSectionBean down = new DownSectionBean();
@@ -136,31 +123,6 @@ class DialogDown {
             int i = 0;
             String bkey = viewModel.bookKey;
 
-//            Observable.from(list)
-//                    .filter(new Func1<DownSectionBean, Boolean>() {
-//                        @Override
-//                        public Boolean call(DownSectionBean bean) {
-//                            return (bean.getStatus() == DownloadStatus.STATE_START && !bean.getAdd());
-//                        }
-//                    })
-//                    .filter(new Func1<DownSectionBean, Boolean>() {
-//                        @Override
-//                        public Boolean call(DownSectionBean bean) {
-//                            int dtype = source.section(bean.getSectionurl()).dtype();
-//                            bean.setType(dtype);
-//                            return (dtype == 1);
-//                        }
-//                    })
-//                    .subscribe(new Action1<DownSectionBean>() {
-//                        @Override
-//                        public void call(DownSectionBean bean) {
-//                            bean.setBkey(bkey);
-//                            bean.setSource(viewModel.source);
-//                            bean.setBookName(viewModel.name);
-//                            bean.setBookUrl(viewModel.bookUrl);
-//                            DownDbApi.addDownedSection(bean);
-//                        }
-//                    });
 
             for (DownSectionBean down : list) {
                 if (down.getStatus() == DownloadStatus.STATE_START && !down.getAdd()) {

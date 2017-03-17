@@ -3,7 +3,7 @@ package seiko.neiko.ui.main;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,16 +15,15 @@ import com.jakewharton.rxbinding.view.RxView;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import seiko.neiko.R;
 import seiko.neiko.dao.FabScroll;
@@ -35,7 +34,6 @@ import seiko.neiko.models.Book;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.app.FragmentBase;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.utils.HintUtil;
 import seiko.neiko.viewModels.BookViewModel;
 import seiko.neiko.widget.fab.FloatingActionMenu;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
@@ -62,21 +60,28 @@ public class MainLikeFragment extends FragmentBase {
 
     @Override
     public void initView() {
-        setRecView();
+        setRec();
+        loadList();
         RxAndroid();
     }
 
-    private void setRecView() {
+    private void setRec() {
         adapter = new MainLikeAdapter();
-        recView.setLayoutManager(new StaggeredGridLayoutManager(LIKE_NUMBER, StaggeredGridLayoutManager.VERTICAL));
+        GridLayoutManager glm = new GridLayoutManager(getContext(), LIKE_NUMBER);
+        recView.setLayoutManager(glm);
         recView.setHasFixedSize(true);
         recView.setAdapterWithLoading(adapter);
-        adapter.addAll(DbApi.getLikeS());
         FabScroll.showFab(recView.get(), menu);
     }
 
-    //=====================================
-    /** RxBus */
+    private void loadList() {
+        Flowable.just(DbApi.getLikeS())
+                .subscribeOn(Schedulers.io())
+                .delay(1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((List<Book> list) -> adapter.addAll(list));
+    }
+
     private void RxAndroid() {
         addSubscription(RxEvent.EVENT_MAIN_LIKE,(RxEvent event) -> {
             final Book book = (Book) event.getData();
@@ -85,7 +90,7 @@ public class MainLikeFragment extends FragmentBase {
             int num = contain(adapter.getData(), book.getBkey());
             if (num >= 0) {
                 if (!book.isref()) {
-                    HintUtil.show("已经收藏");
+                    toast("已经收藏");
                 }
                 return;
             }
@@ -93,15 +98,10 @@ public class MainLikeFragment extends FragmentBase {
             if (adapter.getData().size() == 0) {
                 adapter.add(book);
             } else {
-                adapter.insert(0, book);
+                adapter.insertBack(0, book);
                 adapter.notifyDataSetChanged();
             }
-            HintUtil.show("收藏成功");
-        });
-        addSubscription(RxEvent.EVENT_COPY_LIKE, (RxEvent event) -> {
-            adapter.clear();
-            adapter.addAll(DbApi.getLikeS());
-            adapter.notifyDataSetChanged();
+            toast("收藏成功");
         });
     }
 
@@ -118,32 +118,25 @@ public class MainLikeFragment extends FragmentBase {
     }
 
     /* 检测更新 */
-    private void getRefresh() {addSubscription(subscription());}
-
-    private Disposable subscription() {
+    private void getRefresh() {
         List<Book> like = adapter.getData();
-        return Flowable.create(new FlowableOnSubscribe<Book>() {
-                    @Override
-                    public void subscribe(FlowableEmitter<Book> e) throws Exception {
-                        for (int i = 0;i < like.size();i++) {
-                            Book book = like.get(i);
-                            book.setIndex(i);
-                            e.onNext(book);
-                        }
-                        e.onComplete();
-                    }
-                }, BackpressureStrategy.ERROR)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Book>() {
-                    @Override
-                    public void accept(Book book) throws Exception {
-                        DdSource source = SourceApi.getDefault().getByTitle(book.getSource());
-                        if (source != null) {
-                            getNodeViewModel(source, book);
-                        }
-                    }
-                });
+        Disposable disposable =  Flowable.create((FlowableEmitter<Book> e) -> {
+            for (int i = 0;i < like.size();i++) {
+                    Book book = like.get(i);
+                    book.setIndex(i);
+                    e.onNext(book);
+                }
+                e.onComplete();
+            }, BackpressureStrategy.ERROR)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe((Book book) -> {
+                DdSource source = SourceApi.getDefault().getByTitle(book.getSource());
+                if (source != null) {
+                    getNodeViewModel(source, book);
+                }
+            });
+        addSubscription(disposable);
     }
 
     /* 从网上加载目录内容 */
@@ -219,13 +212,14 @@ public class MainLikeFragment extends FragmentBase {
                 Type type = new TypeToken<List<Book>>(){}.getType();
                 ArrayList<Book> list_like = new Gson().fromJson(json, type);
                 if (list_like != null && list_like.size() != 0) {
-                    for (Book book : list_like) {
+                    int num = list_like.size() - 1;
+                    for (int i=num;i>=0;i--) {
+                        Book book = list_like.get(i);
                         book.setIsref(true);
                         DbApi.addLike(book);
                     }
                 }
                 adapter.addAll(DbApi.getLikeS());
-                toast("恢复成功");
             } else {
                 adapter.loadMoreFailed();
                 toast("没有找到恢复文件");

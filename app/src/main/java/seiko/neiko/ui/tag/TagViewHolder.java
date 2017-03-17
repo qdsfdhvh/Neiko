@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.view.RxView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -13,13 +15,14 @@ import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
+import seiko.neiko.ui.book.BookModel;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
 /**
  * Created by Seiko on 2016/12/20. Y
  */
 
-class TagViewHolder extends AbstractViewHolder<Book> {
+class TagViewHolder extends AbstractViewHolder<BookModel> {
     @BindView(R.id.book_logo)
     ImageView iv;
     @BindView(R.id.book_name)
@@ -29,7 +32,7 @@ class TagViewHolder extends AbstractViewHolder<Book> {
 
     private Context mContext;
     private TagAdapter adapter;
-    private Book book;
+    private BookModel book;
 
     TagViewHolder(ViewGroup parent, TagAdapter adapter) {
         super(parent, R.layout.item_tag);
@@ -39,22 +42,20 @@ class TagViewHolder extends AbstractViewHolder<Book> {
     }
 
     @Override
-    public void setData(Book book) {
+    public void setData(BookModel book) {
         this.book = book;
-        String name = book.getName();
+        String name = book.name;
         if (TextUtils.isEmpty(name))
             name = " ";
 
         tv.setText(name);
-        au.setText(book.getAuthor());
-
-        ImageLoader.getDefault().display(mContext, iv, book.getLogo(), name, book.getUrl());
+        au.setText(book.author);
+        ImageLoader.getDefault().display(mContext, iv, book.logo, name, book.url);
     }
 
     @OnClick(R.id.layout)
     void OnClick() {
-        final int dtype = adapter.source.book(book.getUrl()).dtype();
-        mIntent.Intent_Tag(mContext, book, dtype);
+        mIntent.Intent_Tag(mContext, book);
     }
 
 }

@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lid.lib.LabelImageView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -29,7 +31,7 @@ import static seiko.neiko.dao.engine.DdApi.setLabelText;
 class MainHistViewHolder extends AbstractViewHolder<Book> {
 
     @BindView(R.id.logo)
-    ScaleImageView iv;
+    LabelImageView iv;
     @BindView(R.id.title)
     TextView tv;
 

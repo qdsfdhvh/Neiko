@@ -2,8 +2,6 @@ package seiko.neiko.ui.book;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v7.app.AlertDialog;
@@ -76,13 +74,10 @@ public class AnimeBookActivity extends SwipeLayoutBase {
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        source = SourceApi.getDefault().getByUrl(m.bookUrl);
+        source = SourceApi.getDefault().getByUrl(m.url);
         if (source == null) return;
 
-        if (m.dtype < 1)
-            m.dtype = source.book(m.bookUrl).dtype();
-
-        path = getBookCachePath(m.bookUrl);
+        path = getBookCachePath(m.url);
 
         setRecView();
         initLocal();
@@ -123,14 +118,17 @@ public class AnimeBookActivity extends SwipeLayoutBase {
     /** 从网络中获得内容 */
     private void getNodeViewModel() {
         if (viewModel == null)
-            viewModel = new BookViewModel(source.title, m.bookUrl, m.dtype);
+            viewModel = new BookViewModel(source.title, m.url, m.dtype);
         viewModel.clear();
 
-        source.getNodeViewModel(viewModel, true, m.bookUrl, source.book(m.bookUrl), (code) -> {
+        source.getNodeViewModel(viewModel, true, m.url, source.book(m.url), (code) -> {
             if (code == 1) {
                 if (viewModel.sectionList.size() > 0)
                     FileUtil.save(path, viewModel);
-                DoBindingView();
+
+                if (m != null) {
+                    DoBindingView();
+                }
             } else {
                 gone(nowread2);  //隐藏加载界面
                 toast("链接失败");
@@ -141,7 +139,7 @@ public class AnimeBookActivity extends SwipeLayoutBase {
     /** 内容加载到界面 */
     private void DoBindingView() {
         //生成InfBean
-        bean = new BookInfBean(viewModel.sectionList, viewModel.name, m.bookUrl, m.logo, viewModel.bookKey);
+        bean = new BookInfBean(viewModel.sectionList, viewModel.name, m.url, m.logo, viewModel.bookKey);
         //隐藏加载界面
         gone(nowread2);
         //显示介绍卡片
@@ -153,9 +151,9 @@ public class AnimeBookActivity extends SwipeLayoutBase {
         book_name.setText(viewModel.name);
         //作者
         if (TextUtils.isEmpty(viewModel.author)) {
-            viewModel.author = "null";
+            viewModel.author = "不祥";
         }
-        book_author.setText(viewModel.author);
+        book_author.setText(String.valueOf("作者：" + viewModel.author));
         //介绍
         if (!TextUtils.isEmpty(viewModel.intro)) {
             visible(book_intro);
@@ -167,9 +165,9 @@ public class AnimeBookActivity extends SwipeLayoutBase {
             if (viewModel.book != null)
                 viewModel.book.setLogo(m.logo);
         }
-        ImageLoader.getDefault().display(this, book_logo, viewModel.logo, viewModel.name, m.bookUrl);
+        ImageLoader.getDefault().display(this, book_logo, viewModel.logo, viewModel.name, m.url);
         //目录
-        int dtype = source.section(m.bookUrl).dtype();
+        int dtype = source.section(m.url).dtype();
         glm.setSpanCount(mNum.SecNum(viewModel.sectionList, dtype));   //判断列数
         adapter.setEvent(source, bean);
         adapter.addAll(viewModel.sectionList);
@@ -210,11 +208,7 @@ public class AnimeBookActivity extends SwipeLayoutBase {
 
         rxView(R.id.book_intro);   /* 简介 */
         rxView(R.id.book_name);    /* 续看 */
-        RxView.longClicks(fab_menu.get()).subscribe((Void a) -> {
-            final Uri uri = Uri.parse(viewModel.bookUrl);
-            final Intent it = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(it);
-        });   /* 浏览器打开 */
+        RxView.longClicks(fab_menu.get()).subscribe((Void a) -> mIntent.Intent_Web(this, viewModel.bookUrl));   /* 浏览器打开 */
     }
 
     private void rxView(int id) {

@@ -9,7 +9,6 @@ import java.util.List;
 import seiko.neiko.dao.SourceApi;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.models.Book;
-import seiko.neiko.models.BookPage;
 import seiko.neiko.models.DownSectionBean;
 import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.app.FragmentBase;
@@ -29,7 +28,6 @@ public abstract class Section1FragmentBase extends FragmentBase {
     public static int imgindex;
     public static String bookUrl;
     public static String bookName;
-    public static List<BookPage> bookPages;
     //===========================
     protected DdSource source;
     //===========================
@@ -39,12 +37,13 @@ public abstract class Section1FragmentBase extends FragmentBase {
     public static int t;  //上下拉加载的加减值，正常为1
     //===========================
     protected Section1View section1View;
+    protected Section1Activity activity;
 
-    public Section1FragmentBase() {
+    public void attach(Section1Activity activity) {
         source = SourceApi.getDefault().getByUrl(bookUrl);
-        bookPages = new ArrayList<>();        //章节内容集合
+        activity.bookPages = new ArrayList<>();        //章节内容集合
+        this.activity = activity;
     }
-
 
     //==============================================
     /** 判断是否到list底部 */
@@ -55,7 +54,6 @@ public abstract class Section1FragmentBase extends FragmentBase {
         }
         return false;
     }
-
 
     //==============================================
     /** 读取本地图片链接 */
@@ -78,7 +76,6 @@ public abstract class Section1FragmentBase extends FragmentBase {
         }
         return null;
     }
-
 
     //==============================================
     /** 开放接口 */

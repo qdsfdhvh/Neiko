@@ -14,11 +14,19 @@
     <include layout="@layout/control_back"/>
 
     <!-- 漫画标题 -->
-    <include layout="@layout/control_section_title" />
+    <include layout="@layout/control_section_title"/>
+
+    <TextView
+        android:id="@+id/load"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="解析中"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:gravity="center"/>
 
     <!-- 控制界面 -->
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/control"
         android:layout_width="320dp"
         android:layout_height="wrap_content"

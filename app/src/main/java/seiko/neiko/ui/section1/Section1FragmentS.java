@@ -32,6 +32,7 @@ public class Section1FragmentS extends Section1FragmentBase {
     @BindView(R.id.refresh_view)
     VerticalPullToRefreshLayout refresh_view;
 
+
     @Override
     public int getLayoutId() {return R.layout.fragment_section1_stream;}
 
@@ -71,6 +72,7 @@ public class Section1FragmentS extends Section1FragmentBase {
             source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), (code) -> {
                 if (code == 1) {
                     addAadapter(viewModel.sectionList, book, imgindex, isprev);
+                    activity.readOk();
                 }
             });
         }
@@ -86,7 +88,7 @@ public class Section1FragmentS extends Section1FragmentBase {
         switch (isprev) {
             case 0:
                 adapter.addAll(list);
-                bookPages.add(bookPage);
+                activity.bookPages.add(bookPage);
                 if (dtype == 1) { //读取记录
                     int lastpage = DbApi.getLastBookPage(book.getSection_url());
                     recView.scrollToPosition(lastpage);
@@ -94,12 +96,12 @@ public class Section1FragmentS extends Section1FragmentBase {
                 break;
             case 1:
                 adapter.insertAll(0, list);
-                bookPages.add(0, bookPage);
+                activity.bookPages.add(0, bookPage);
                 refresh_view.refreshFinish(PullToRefreshState.SUCCEED);
                 break;
             case -1:
                 adapter.insertAllBack(adapter.getDataSize() - 1, list);
-                bookPages.add(bookPage);
+                activity.bookPages.add(bookPage);
                 refresh_view.loadmoreFinish(PullToRefreshState.SUCCEED);
                 break;
         }
@@ -140,8 +142,9 @@ public class Section1FragmentS extends Section1FragmentBase {
                 BookPage book = new BookPage();
                 book.setBook_pages(viewModel4.sectionList.size());
                 book.setBook_title(bookName);
-                bookPages.add(book);
+                activity.bookPages.add(book);
                 adapter.addAll(viewModel4.sectionList);
+                activity.readOk();
             }
         });
     }

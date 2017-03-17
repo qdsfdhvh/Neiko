@@ -1,5 +1,8 @@
 package seiko.neiko.dao;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -9,7 +12,6 @@ import java.util.List;
 import seiko.neiko.app.App;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.utils.HintUtil;
 
 
 /**
@@ -37,7 +39,7 @@ public class SourceApi {
 
     //===============================================
     /** 尝试读取sited */
-    public boolean readSited(String name) {
+    public boolean readSited(Context from, String name) {
         for (DdSource sd : _sourceList) {
             if (sd.title.contains(name))
                 return true;
@@ -45,9 +47,15 @@ public class SourceApi {
 
         String sited = getSiteD(name);
         if (TextUtils.isEmpty(sited)) {
-            HintUtil.show("请安装:" + name);
+            new AlertDialog.Builder(from)
+                    .setMessage("需要安装插件:" + name)
+                    .setNegativeButton("访问", (DialogInterface dif, int j) -> mIntent.Intent_Web(from, "http://sited.noear.org/?key=" + name))
+                    .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())
+                    .create()
+                    .show();
             return false;
         }
+
         loadSource(sited, null);
         return true;
     }

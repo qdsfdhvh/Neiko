@@ -39,6 +39,7 @@ public class Section1FragmentP extends Section1FragmentBase {
         setPtrHandler();
     }
 
+
     private void setRecView() {
         adapter = new Section1FragmentPAdapter(bookUrl);
         llm = new LinearLayoutManager(getContext());
@@ -98,6 +99,7 @@ public class Section1FragmentP extends Section1FragmentBase {
             source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), (code) -> {
                 if (code == 1) {
                     addAadapter(viewModel.sectionList, book, imgindex, isprev);
+                    activity.readOk();
                 }
             });
         }
@@ -113,7 +115,7 @@ public class Section1FragmentP extends Section1FragmentBase {
         switch (isprev) {
             case 0:
                 adapter.addAll(list);
-                bookPages.add(bookPage);
+                activity.bookPages.add(bookPage);
                 if (dtype == 1) { //读取记录
                     int lastpage = DbApi.getLastBookPage(book.getSection_url());
                     recView.scrollToPosition(lastpage);
@@ -121,12 +123,12 @@ public class Section1FragmentP extends Section1FragmentBase {
                 break;
             case 1:
                 adapter.insertAll(0, list);
-                bookPages.add(0, bookPage);
+                activity.bookPages.add(0, bookPage);
                 toast("加载完成");
                 break;
             case -1:
                 adapter.addAll(list);
-                bookPages.add(bookPage);
+                activity.bookPages.add(bookPage);
                 toast("加载完成");
                 break;
         }

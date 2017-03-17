@@ -11,10 +11,9 @@ import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 class Section2Adapter extends AbstractAdapter<TxtModel, Section2ViewHolder> {
 
-    private int textSize;
-    private int dtype;
-
-
+    int textSize;
+    int dtype;
+    int textColor;
 
     @Override
     protected Section2ViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {
@@ -25,21 +24,6 @@ class Section2Adapter extends AbstractAdapter<TxtModel, Section2ViewHolder> {
     protected void onNewBindViewHolder(Section2ViewHolder holder, int position) {
         holder.setData(get(position));
     }
-
-    //===============================
-    /** 字体大小 */
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
-    }
-
-    public int getTextSize() {
-        return textSize;
-    }
-    //===============================
-    /** 类型 */
-    public void setDtype(int dtype) {this.dtype = dtype;}
-
-    public int getDtype() {return dtype;}
 
     //===============================
     /** 开放加载章节按钮 */

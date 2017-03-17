@@ -157,7 +157,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
     //=============================================
     @OnClick(R.id.img)
     void intentBook() {
-        if (SourceApi.getDefault().readSited(data.getSource())) {
+        if (SourceApi.getDefault().readSited(mContext, data.getSource())) {
             AnimeBookActivity.m = new BookModel(-1, data.getUrl(), data.getImage());
             Intent intent = new Intent(mContext, AnimeBookActivity.class);
             mContext.startActivity(intent);
@@ -166,7 +166,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
 
     @OnClick(R.id.layout)
     void intentDownSection() {
-        if (SourceApi.getDefault().readSited(data.getSource())) {
+        if (SourceApi.getDefault().readSited(mContext, data.getSource())) {
             Download2Activity.data = data;
             Intent intent = new Intent(mContext, Download2Activity.class);
             mContext.startActivity(intent);
