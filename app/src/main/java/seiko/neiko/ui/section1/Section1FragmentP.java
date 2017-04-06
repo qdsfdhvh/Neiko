@@ -1,7 +1,10 @@
 package seiko.neiko.ui.section1;
 
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import org.noear.sited.SdSourceCallback;
 
 import java.util.List;
 
@@ -10,6 +13,7 @@ import seiko.neiko.R;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.models.Book;
 import seiko.neiko.models.BookPage;
+import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.viewModels.Section1ViewModel;
 
 /**
@@ -30,24 +34,25 @@ public class Section1FragmentP extends Section1FragmentBase {
     @Override
     public int getLayoutId() {return R.layout.fragment_section1_page;}
 
-
     @Override
-    public void initView() {
+    public void initViews(Bundle bundle) {
         setRecView();
         viewModel = new Section1ViewModel();
         getNodeViewModel(imgList.get(imgindex), imgindex, 0);
         setPtrHandler();
     }
 
-
     private void setRecView() {
         adapter = new Section1FragmentPAdapter(bookUrl);
         llm = new LinearLayoutManager(getContext());
+//        llm.setOrientation(LinearLayoutManager.HORIZONTAL);
         recView.setLayoutManager(llm);
         recView.setHasFixedSize(true);
         recView.setAdapter(adapter);
+
         section1View.onScroll(recView, llm);
     }
+
 
     //=================================================
     /** dtype1：加载更多 */
@@ -89,23 +94,26 @@ public class Section1FragmentP extends Section1FragmentBase {
 
     //=================================================
     /** 先尝试本地加载，再从网络中加载数据 */
-    private void getNodeViewModel(Book book, int imgindex, int isprev) {
+    private void getNodeViewModel(final Book book, final int imgindex, final int isprev) {
         nowload = true;
-        List<Book> sectionList = readPath(book.getSection());
-        if (sectionList != null) {
-            addAadapter(sectionList, book, imgindex, isprev);
+        List<ImgUrlBean> list = readPath(book.getSection());
+        if (list  != null) {
+            addAadapter(list, book, imgindex, isprev);
         } else {
             viewModel.clear();
-            source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), (code) -> {
-                if (code == 1) {
-                    addAadapter(viewModel.sectionList, book, imgindex, isprev);
-                    activity.readOk();
+            source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), new SdSourceCallback() {
+                @Override
+                public void run(Integer code) {
+                    if (code == 1) {
+                        addAadapter(viewModel.imgList, book, imgindex, isprev);
+                        activity.readOk();
+                    }
                 }
             });
         }
     }
 
-    private void addAadapter(List<Book> list, Book book, int imgindex, int isprev) {
+    private void addAadapter(List<ImgUrlBean> list, Book book, int imgindex, int isprev) {
         BookPage bookPage = new BookPage();
         bookPage.setBook_pages(list.size());
         bookPage.setBook_title(book.getSection());

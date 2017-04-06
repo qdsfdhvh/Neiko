@@ -1,12 +1,10 @@
 package seiko.neiko.viewModels;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.dou361.ijkplayer.bean.VideoijkBean;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.noear.sited.ISdViewModel;
@@ -15,7 +13,6 @@ import org.noear.sited.SdNode;
 import java.util.ArrayList;
 import java.util.List;
 
-import seiko.neiko.models.MediaModel;
 
 
 /**

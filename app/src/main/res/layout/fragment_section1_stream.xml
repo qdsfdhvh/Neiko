@@ -4,16 +4,11 @@
     android:id="@+id/refresh_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <include layout="@layout/refresh_load_head"/>
-
-    <!-- 漫画列表_流水 -->
     <seiko.neiko.widget.refresh.PullableZoomableRecyclerView
         android:id="@+id/recView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="match_parent"/><!-- 漫画列表_流水 -->
     <include layout="@layout/refresh_load_more"/>
-
 </seiko.neiko.widget.refresh.VerticalPullToRefreshLayout>
 

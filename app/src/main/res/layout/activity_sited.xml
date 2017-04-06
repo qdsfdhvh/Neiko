@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ui.sited.SitedActivity">
+    tools:context=".ui.sited.SitedItemActivity">
 
     <!-- 顶部背景 -->
     <include layout="@layout/nav_top_view"/>

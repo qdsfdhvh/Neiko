@@ -10,6 +10,7 @@ import butterknife.ButterKnife;
 import seiko.neiko.R;
 import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.models.Book;
+import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.widget.ScaleImageView;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
@@ -17,7 +18,7 @@ import zlc.season.practicalrecyclerview.AbstractViewHolder;
  * Created by Seiko on 2017/1/22. Y
  */
 
-class Section1FragmentSViewHolder extends AbstractViewHolder<Book> {
+class Section1FragmentSViewHolder extends AbstractViewHolder<ImgUrlBean> {
 
     @BindView(R.id.section_views)
     ScaleImageView iv;
@@ -31,18 +32,18 @@ class Section1FragmentSViewHolder extends AbstractViewHolder<Book> {
     }
 
     @Override
-    public void setData(Book book) {
-        ImageLoader.getDefault().display9(itemView, iv, get(book), adapter.getRefererUrl());
+    public void setData(ImgUrlBean bean) {
+        ImageLoader.getDefault().display9(itemView, iv, get(bean), adapter.ref());
     }
 
-    private String get(Book book) {
+    private String get(ImgUrlBean bean) {
         String url;
-        String path = book.getPath();
+        String path = bean.getPath();
         if (path != null && new File(path).exists()) {
             url = path;
             Log.d("AdapterSection1", path);
         } else {
-            url = book.getSection_url();
+            url = bean.getUrl();
         }
         return url;
     }

@@ -66,7 +66,7 @@ class Util {
         }
     }
 
-    protected static void http(SdSource source, boolean isUpdate, HttpMessage msg) {
+    protected static void http(final SdSource source, boolean isUpdate, final HttpMessage msg) {
 
         log(source, "Util.http", msg.url);
 
@@ -92,27 +92,33 @@ class Util {
             if (block != null && !block.isOuttime(msg.config)) {
                 final __CacheBlock block1 = block;
 
-                new Handler().postDelayed(() -> {
-                    log(source, "Util.incache.url", msg.url);
-                    msg.callback.run(1, msg, block1.value, null);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        log(source, "Util.incache.url", msg.url);
+                        msg.callback.run(1, msg, block1.value, null);
+                    }
                 }, 100);
                 return;
             }
         }
 
-        doHttp(source, msg, block, (code, msg2, data, url302) -> {
-            if (code == 1) {
-                cache.save(cacheKey, data);
-            }
+        doHttp(source, msg, block, new HttpCallback() {
+            @Override
+            public void run(Integer code, HttpMessage msg2, String data, String url302) {
+                if (code == 1) {
+                    cache.save(cacheKey, data);
+                }
 
-            msg.callback.run(code, msg2, data, url302);
+                msg.callback.run(code, msg2, data, url302);
+            }
         });
 
         source.DoTraceUrl(msg.url, args, msg.config);
     }
 
-    private static void doHttp(SdSource source, HttpMessage msg, __CacheBlock cache, HttpCallback callback) {
-        __AsyncTag httpTag = new __AsyncTag();
+    private static void doHttp(final SdSource source, final HttpMessage msg, final __CacheBlock cache, final HttpCallback callback) {
+        final __AsyncTag httpTag = new __AsyncTag();
 
         OkCallback callback1 = new OkCallback<String>(new OkTextParser(msg.encode)) {
             @Override

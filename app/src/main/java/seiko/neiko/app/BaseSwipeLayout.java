@@ -12,7 +12,7 @@ import seiko.neiko.widget.SwipeBackLayout;
  * 有滑返回的layout
  */
 
-public abstract class SwipeLayoutBase extends ActivityBase {
+public abstract class BaseSwipeLayout extends BaseActivity {
     public SwipeBackLayout swipeBackLayout;
 
     @Override

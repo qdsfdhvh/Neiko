@@ -12,29 +12,25 @@ import android.widget.Toast;
 import java.util.List;
 
 import butterknife.ButterKnife;
-//import rx.Subscription;
-//import rx.functions.Action1;
-//import rx.subscriptions.CompositeSubscription;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import seiko.neiko.models.Book;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
-import seiko.neiko.view.FragmentView;
 
 /**
  * Created by Seiko on 2016/11/15. YiKu
  */
 
-public abstract class FragmentBase extends Fragment implements FragmentView {
+public abstract class BaseFragment extends Fragment implements BaseView {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(getLayoutId(), container, false);
         ButterKnife.bind(this, view);
         Subscription();
-        initView();
+        initViews(savedInstanceState);
         return view;
     }
 
@@ -84,7 +80,12 @@ public abstract class FragmentBase extends Fragment implements FragmentView {
     protected void toast(String msg) {
         final Toast toast= Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
         toast.show();
-        new Handler().postDelayed(() -> toast.cancel(), 500);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 1000);
     }
 
 }

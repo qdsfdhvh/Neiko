@@ -35,4 +35,5 @@
     <string name="section2_set_textsize">字体大小</string>
     <string name="nav_sited">插件</string>
     <string name="section2_set_texttheme">字体样式</string>
+    <string name="video_mode">选择播放器</string>
 </resources>

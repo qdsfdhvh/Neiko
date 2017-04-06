@@ -9,8 +9,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import seiko.neiko.R;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.app.BaseSwipeLayout;
 import seiko.neiko.ui.book.BookModel;
+import seiko.neiko.view.TagView;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
@@ -18,7 +19,7 @@ import zlc.season.practicalrecyclerview.PracticalRecyclerView;
  * Created by Seiko on 2016/9/10.YiKu
  */
 
-public class TagActivity extends SwipeLayoutBase implements TagView {
+public class TagActivity extends BaseSwipeLayout implements TagView {
 
     public static TagModel m;
 
@@ -37,13 +38,12 @@ public class TagActivity extends SwipeLayoutBase implements TagView {
     public int getLayoutId() {return R.layout.activity_tag;}
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         mTitle.setText(m.tagName);
 
         mAdapter = new TagAdapter();
         mPresenter = new TagPresenter(source, m.tagUrl);
-        mPresenter.attachView(this);
+        mPresenter.setItemCallBack(this);
 
         recView.setLayoutManager(new LinearLayoutManager(this));
         recView.setHasFixedSize(true);
@@ -51,7 +51,12 @@ public class TagActivity extends SwipeLayoutBase implements TagView {
 
         fastScroller.setRecyclerView(recView.get());
         recView.get().addOnScrollListener(fastScroller.getOnScrollListener());
-        recView.setLoadMoreListener(() -> mPresenter.loadData(false));
+        recView.setLoadMoreListener(new PracticalRecyclerView.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                mPresenter.loadData(false);
+            }
+        });
 
         mPresenter.loadData(true);
     }
@@ -60,7 +65,7 @@ public class TagActivity extends SwipeLayoutBase implements TagView {
     /** 加载数据 */
     @Override
     public void onLoadSuccess(List<BookModel> list) {
-        mTitle.setText(m.tagName + " 第" + mPresenter.getPage() + "页");
+        mTitle.setText(String.valueOf(m.tagName + " 第" + mPresenter.getPage() + "页"));
         mAdapter.addAll(list);
     }
 

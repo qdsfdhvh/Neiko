@@ -3,6 +3,7 @@ package seiko.neiko.ui.main;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
@@ -11,26 +12,29 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.reflect.TypeToken;
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import seiko.neiko.R;
 import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.db.SiteDbApi;
 import seiko.neiko.models.SourceModel;
 import seiko.neiko.rx.RxEvent;
-import seiko.neiko.app.FragmentBase;
+import seiko.neiko.app.BaseFragment;
 import seiko.neiko.utils.FileUtil;
 import seiko.neiko.widget.fab.FloatingActionButton;
 import seiko.neiko.widget.fab.FloatingActionMenu;
@@ -46,7 +50,7 @@ import static seiko.neiko.dao.mPath.sitedPath;
  * Created by Seiko on 2016/11/9. YiKu
  */
 
-public class MainSiteDFragment extends FragmentBase implements OnDragListener {
+public class MainSiteDFragment extends BaseFragment implements OnDragListener {
 
     @BindView(R.id.recView)
     PracticalRecyclerView recView;
@@ -69,9 +73,8 @@ public class MainSiteDFragment extends FragmentBase implements OnDragListener {
     @Override
     public int getLayoutId() {return R.layout.fragment_main;}
 
-    /** 从数据库加载数据 */
     @Override
-    public void initView() {
+    public void initViews(Bundle bundle) {
         setRec();
         loadList();
         RxAndroid();
@@ -111,90 +114,115 @@ public class MainSiteDFragment extends FragmentBase implements OnDragListener {
 
         dialog = new AlertDialog.Builder(getActivity())
                 .setView(linear)
-                .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())
+                .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
                 .create();
         dialog.show();
     }
 
-    private void rxView(View v, String url) {
-        RxView.clicks(v).subscribe((Void aVoid) -> {
-            dialog.dismiss();
+    private void rxView(View v, final String url) {
+        RxView.clicks(v).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                dialog.dismiss();
 
-            final Uri uri = Uri.parse(url);
-            final Intent it = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(it);
+                final Uri uri = Uri.parse(url);
+                final Intent it = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(it);
+            }
         });
     }
 
     //=====================================
     /** RxBus */
     private void RxAndroid() {
-        addSubscription(RxEvent.EVENT_COPY_SITED, (RxEvent event) -> {
-            adapter.clear();
-            adapter.addAll(SiteDbApi.getSources());
-            adapter.notifyDataSetChanged();
+        addSubscription(RxEvent.EVENT_COPY_SITED, new Consumer<RxEvent>() {
+            @Override
+            public void accept(RxEvent event) throws Exception {
+                adapter.clear();
+                adapter.addAll(SiteDbApi.getSources());
+                adapter.notifyDataSetChanged();
+            }
         });
-        addSubscription(RxEvent.EVENT_MAIN_SITED, (RxEvent event) -> {
-            SourceModel m = (SourceModel) event.getData();
-            if (adapter != null) {
-                for (SourceModel m1:adapter.getData()) {
-                    if (m1.title.contains(m.title))
-                        return;
+        addSubscription(RxEvent.EVENT_MAIN_SITED, new Consumer<RxEvent>() {
+            @Override
+            public void accept(RxEvent event) throws Exception {
+                SourceModel m = (SourceModel) event.getData();
+                if (adapter != null) {
+                    for (SourceModel m1:adapter.getData()) {
+                        if (m1.title.contains(m.title))
+                            return;
+                    }
+
+                    adapter.add(m);
+
+                    saveData();
                 }
-
-                adapter.add(m);
-
-                saveData();
             }
         });
         /* 删除模式 */
-        RxView.clicks(fab_delete).subscribe((Void aVoid) -> {
-            if (isdelete) {
-                fab_delete.setSelected(false);
-                isdelete = false;
-                for (ShowView view:shows) {
-                    view.ShowCheck(false);
+        RxView.clicks(fab_delete).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                if (isdelete) {
+                    fab_delete.setSelected(false);
+                    isdelete = false;
+                    for (ShowView view:shows) {
+                        view.ShowCheck(false);
+                    }
+                } else {
+                    fab_delete.setSelected(true);
+                    isdelete = true;
+                    for (ShowView view:shows) {
+                        view.ShowCheck(true);
+                    }
                 }
-            } else {
-                fab_delete.setSelected(true);
-                isdelete = true;
-                for (ShowView view:shows) {
-                    view.ShowCheck(true);
-                }
+                adapter.setDelete(isdelete);
+                ischange = true;
             }
-            adapter.setDelete(isdelete);
-            ischange = true;
         });
     }
 
     //=====================================
     /** List相关 */
     private void loadList() {
-        Flowable.create((FlowableEmitter<List<SourceModel>> e) -> {
-                Type type = new TypeToken<List<SourceModel>>(){}.getType();
-                List<SourceModel> list = FileUtil.get(cachePath + "main/siteDList", type);
+        Flowable.create(new FlowableOnSubscribe<List<SourceModel>>() {
+                    @Override
+                    public void subscribe(FlowableEmitter<List<SourceModel>> e) throws Exception {
+                        Type type = new TypeToken<List<SourceModel>>(){}.getType();
+                        List<SourceModel> list = FileUtil.get(cachePath + "main/siteDList", type);
 
-                if (list == null) {
-                    Log.d("MainSiteD", "本地加载失败");
-                    list = new ArrayList<>();
-                    File file = new File(sitedPath);
+                        if (list == null) {
+                            Log.d("MainSiteD", "本地加载失败");
+                            list = new ArrayList<>();
+                            File file = new File(sitedPath);
 
-                    if (file.listFiles() != null && file.listFiles().length > 0) {
-                        for (File a : file.listFiles()) {
-                            SourceModel m = new SourceModel();
-                            m.title = a.getName();
-                            list.add(m);
+                            if (file.listFiles() != null && file.listFiles().length > 0) {
+                                for (File a : file.listFiles()) {
+                                    SourceModel m = new SourceModel();
+                                    m.title = a.getName();
+                                    list.add(m);
+                                }
+                            }
                         }
-                    }
-                }
 
-                e.onNext(list);
-                e.onComplete();
-        }, BackpressureStrategy.ERROR)
+                        e.onNext(list);
+                        e.onComplete();
+                    }
+                }, BackpressureStrategy.ERROR)
                 .subscribeOn(Schedulers.io())
-//                .delay(1, TimeUnit.SECONDS)
+                .delay(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((List<SourceModel> list) ->adapter.addAll(list));
+                .subscribe(new Consumer<List<SourceModel>>() {
+                    @Override
+                    public void accept(List<SourceModel> list) throws Exception {
+                        adapter.addAll(list);
+                    }
+                });
     }
 
     private boolean ischange = false;

@@ -1,9 +1,5 @@
 package okhttp;
 
-/**
- * Created by Seiko on 2017/2/16. Y
- */
-
 import android.os.Handler;
 import android.os.Looper;
 
@@ -33,30 +29,49 @@ public abstract class OkCallback<T> implements Callback {
     }
 
     @Override
-    public void onFailure(Call call, IOException e) {mHandler.post(() -> onFailure(e));}
+    public void onFailure(Call call, final IOException e) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                onFailure(e);
+            }
+        });
+    }
 
     @Override
-    public void onResponse(Call call, Response response) throws IOException {
+    public void onResponse(Call call, final Response response) throws IOException {
         final int code = mParser.getCode();
         try {
             final T t = mParser.parseResponse(response);
             if (response.isSuccessful() && t != null) {
-                mHandler.post(() -> {
-                    List<String> cookies = response.headers("Set-Cookie");
-                    String cookie = "";
-                    for (int i=cookies.size()-1; i>=0; i--) {
-                        cookie = cookie + cookies.get(i).replace("path=/", "") + " ";
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> cookies = response.headers("Set-Cookie");
+                        String cookie = "";
+                        for (int i=cookies.size()-1; i>=0; i--) {
+                            cookie = cookie + cookies.get(i).replace("path=/", "") + " ";
+                        }
+                        onSuccess(cookie, t);
                     }
-                    onSuccess(cookie, t);
                 });
             } else {
-                mHandler.post(() -> onFailure(new Exception(Integer.toString(code)) ));
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onFailure(new Exception(Integer.toString(code)));
+                    }
+                });
             }
         } catch (final Exception e) {
-            mHandler.post(() -> onFailure(e));
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onFailure(e);
+                }
+            });
         }
     }
-
 
     public abstract void onSuccess(String cookies, T t);
 

@@ -1,24 +1,23 @@
 package seiko.neiko.ui.section3;
 
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.dou361.ijkplayer.bean.VideoijkBean;
 import com.dou361.ijkplayer.widget.PlayerView;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import seiko.neiko.R;
-import seiko.neiko.app.FragmentBase;
+import seiko.neiko.app.BaseFragment;
 import seiko.neiko.utils.MediaUtil;
 
 /**
  * Created by Seiko on 2016/12/21. Y
  */
 
-public class Section3VideoFragment extends FragmentBase {
+public class Section3VideoFragment extends BaseFragment {
 
 //    private final String TAG = "Section3VideoFragment";
 
@@ -31,7 +30,7 @@ public class Section3VideoFragment extends FragmentBase {
     public int getLayoutId() {return R.layout.fragment_section3_video;}
 
     @Override
-    public void initView() {
+    public void initViews(Bundle bundle) {
         getActivity().setContentView(R.layout.simple_player_view_player);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

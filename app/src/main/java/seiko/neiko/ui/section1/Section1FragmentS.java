@@ -1,7 +1,11 @@
 package seiko.neiko.ui.section1;
 
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import org.noear.sited.SdSourceCallback;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -9,6 +13,7 @@ import seiko.neiko.R;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.models.Book;
 import seiko.neiko.models.BookPage;
+import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.viewModels.BookViewModel;
 import seiko.neiko.viewModels.Section1ViewModel;
 import seiko.neiko.widget.refresh.IPullToRefreshView;
@@ -37,7 +42,7 @@ public class Section1FragmentS extends Section1FragmentBase {
     public int getLayoutId() {return R.layout.fragment_section1_stream;}
 
     @Override
-    public void initView() {
+    public void initViews(Bundle bundle) {
         setRecView();
         switch (dtype) {
             case 1:
@@ -63,22 +68,24 @@ public class Section1FragmentS extends Section1FragmentBase {
 
     //=================================================
     /** dtype1：加载数据 */
-    private void getNodeViewModel(Book book, int imgindex, int isprev) {
-        List<Book> sectionList = readPath(book.getSection());
-        if (sectionList != null) {
-            addAadapter(sectionList, book, imgindex, isprev);
+    private void getNodeViewModel(final Book book, final int imgindex, final int isprev) {
+        List<ImgUrlBean> list = readPath(book.getSection());
+        if (list != null) {
+            addAadapter(list, book, imgindex, isprev);
         } else {
             viewModel.clear();
-            source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), (code) -> {
-                if (code == 1) {
-                    addAadapter(viewModel.sectionList, book, imgindex, isprev);
-                    activity.readOk();
+            source.getNodeViewModel(viewModel, true, book.getSection_url(), source.section(book.getSection_url()), new SdSourceCallback() {
+                @Override
+                public void run(Integer code) {
+                    if (code == 1) {
+                        addAadapter(viewModel.imgList, book, imgindex, isprev);
+                    }
                 }
             });
         }
     }
 
-    private void addAadapter(List<Book> list, Book book, int imgindex, int isprev) {
+    private void addAadapter(List<ImgUrlBean> list, Book book, int imgindex, int isprev) {
         BookPage bookPage = new BookPage();
         bookPage.setBook_pages(list.size());
         bookPage.setBook_title(book.getSection());
@@ -105,6 +112,7 @@ public class Section1FragmentS extends Section1FragmentBase {
                 refresh_view.loadmoreFinish(PullToRefreshState.SUCCEED);
                 break;
         }
+        activity.readOk();
     }
 
     //=================================================
@@ -137,14 +145,17 @@ public class Section1FragmentS extends Section1FragmentBase {
     /** dtype4：从网络中加载数据 */
     private void getNodeViewModel() {
         viewModel4.clear();
-        source.getNodeViewModel(viewModel4, false, bookUrl, source.book(bookUrl), (code) -> {
-            if (code == 1) {
-                BookPage book = new BookPage();
-                book.setBook_pages(viewModel4.sectionList.size());
-                book.setBook_title(bookName);
-                activity.bookPages.add(book);
-                adapter.addAll(viewModel4.sectionList);
-                activity.readOk();
+        source.getNodeViewModel(viewModel4, false, bookUrl, source.book(bookUrl), new SdSourceCallback() {
+            @Override
+            public void run(Integer code) {
+                if (code == 1) {
+                    BookPage book = new BookPage();
+                    book.setBook_pages(viewModel4.list.size());
+                    book.setBook_title(bookName);
+                    activity.bookPages.add(book);
+                    adapter.addAll(viewModel4.list);
+                    activity.readOk();
+                }
             }
         });
     }

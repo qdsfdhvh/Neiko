@@ -16,9 +16,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
-//import rx.Subscription;
-import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import seiko.neiko.R;
 import seiko.neiko.dao.db.DownDbApi;
 import seiko.neiko.dao.mIntent;
@@ -58,8 +58,6 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
     private Download2Adapter mAdapter;
     private DownSectionBean mData;
     private Context mContext;
-//    private Subscription rx1;
-    private Disposable rx1;
 
     private String path;      //保存路径
 
@@ -78,7 +76,6 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
         //加载rx
         addRxAndroid();
     }
-
 
     /** 初始化 */
     private void loadData() {
@@ -110,7 +107,7 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
                 mStatus.setText("下载完成");
                 mStatus.setClickable(false);
                 return;
-            case DownloadStatus.STATE_DOWNLOADING:
+            case DownloadStatus.STATE_PROCRESS:
                 mStatus.setText("停止");
                 return;
             case DownloadStatus.STATE_WAITING:
@@ -133,61 +130,69 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
     }
 
     private void addRxAndroid() {
-        //下载状态
-        if (rx1 == null) {
-            rx1 = RxBus.getDefault().toObservable(RxEvent.EVENT_DOWN2_STATUS)
-                    .subscribe((RxEvent event) -> {
-                        String url = (String) event.getData();
-                        if (mData.getSectionurl().equals(url)) {
-                            int status = (int) event.getData(1);
-                            switch (status) {
-                                case DownloadStatus.STATE_PROCRESS:
-                                    int success = (int) event.getData(2);
-                                    int failed  = (int) event.getData(3);
-                                    //刷新界面进度
-                                    mData.setSuccess(success);
-                                    mData.setFailed(failed);
-                                    mProgress.setProgress(success);
-                                    mCallback.setText(String.valueOf(success + "成功" + failed + "失败"));
-                                    mSize.setText(String.valueOf((success + failed) + "/" + mData.getTotal()));
-                                    return;
-                                case DownloadStatus.STATE_DOLOAD:
-                                    mData.setStatus(status);
-                                    mStatus.setText("解析中");
-                                    return;
-                                case DownloadStatus.STATE_WAITING:
-                                    mData.setStatus(status);
-                                    mStatus.setText("排队");
-                                    return;
-                                case DownloadStatus.STATE_DOWNLOADING:
-                                    mData.setStatus(status);
-                                    mStatus.setText("停止");
-                                    int size = (int) event.getData(2);
-                                    mData.setTotal(size);
-                                    mProgress.setMax(size);
-                                    return;
-                                case DownloadStatus.STATE_PAUSED:
-                                    mData.setStatus(status);
-                                    mStatus.setText("继续");
-                                    int success2 = (int) event.getData(2);
-                                    int failed2  = (int) event.getData(3);
-                                    mData.setSuccess(success2);
-                                    mData.setFailed(failed2);
-                                    return;
-                                case DownloadStatus.STATE_DOWNLOADED:
-                                    mData.setStatus(status);
-                                    mStatus.setText("下载完成");
-                                    mData.setSuccess(mData.getTotal());
-                                    return;
-                                case DownloadStatus.STATE_START:
-                                    mData.setStatus(status);
-                                    mStatus.setText("重新尝试");
-                                    mData.setSuccess(0);
-                                    break;
-                            }
-                        }
-                    });
-        }
+        Disposable rx1 = RxBus.getDefault().toObservable(RxEvent.EVENT_DOWN2_STATUS)
+            .filter(new Predicate<RxEvent>() {
+                @Override
+                public boolean test(RxEvent event) throws Exception {
+                    return mData.getSectionurl().equals(event.getData());
+                }
+            })
+            .subscribe(new Consumer<RxEvent>() {
+                @Override
+                public void accept(RxEvent event) throws Exception {
+                    int status = (int) event.getData(1);
+                    switch (status) {
+                        case DownloadStatus.STATE_PROCRESS:
+                            int success = (int) event.getData(2);
+                            int failed  = (int) event.getData(3);
+                            int size    = (int) event.getData(4);
+                            //刷新界面进度
+                            mData.setTotal(size);
+                            mProgress.setMax(size);
+                            mStatus.setText("停止");
+
+                            mData.setSuccess(success);
+                            mData.setFailed(failed);
+                            mProgress.setProgress(success);
+                            mCallback.setText(String.valueOf(success + "成功" + failed + "失败"));
+                            mSize.setText(String.valueOf((success + failed) + "/" + size));
+                            return;
+                        case DownloadStatus.STATE_DOLOAD:
+                            mData.setStatus(status);
+                            mStatus.setText("解析中");
+                            return;
+                        case DownloadStatus.STATE_WAITING:
+                            mData.setStatus(status);
+                            mStatus.setText("排队");
+                            return;
+//                                case DownloadStatus.STATE_DOWNLOADING:
+//                                    mData.setStatus(status);
+//                                    mStatus.setText("停止");
+//                                    int size = (int) event.getData(2);
+//                                    mData.setTotal(size);
+//                                    mProgress.setMax(size);
+//                                    return;
+                        case DownloadStatus.STATE_PAUSED:
+                            mData.setStatus(status);
+                            mStatus.setText("继续");
+                            int success2 = (int) event.getData(2);
+                            int failed2  = (int) event.getData(3);
+                            mData.setSuccess(success2);
+                            mData.setFailed(failed2);
+                            return;
+                        case DownloadStatus.STATE_DOWNLOADED:
+                            mData.setStatus(status);
+                            mStatus.setText("下载完成");
+                            mData.setSuccess(mData.getTotal());
+                            return;
+                        case DownloadStatus.STATE_START:
+                            mData.setStatus(status);
+                            mStatus.setText("重新尝试");
+                            mData.setSuccess(0);
+                            break;
+                    }
+                }
+            });
         mAdapter.getmSubscriptions().add(rx1);
     }
 
@@ -204,16 +209,29 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
     boolean onLongClick() {
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除漫画："+ mData.getSection())
-                .setNegativeButton("是", (DialogInterface dif, int j) -> delSection(mData.getSectionurl()))   //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss() )      //通知最右按钮
-                .setNeutralButton("初始化", (DialogInterface dif, int j) -> {
-                    mData.setList(null);
-                    mData.setSuccess(0);
-                    mData.setFailed(0);
-                    mData.setStatus(DownloadStatus.STATE_START);
-                    mStatus.setText("下载");
-                    mStatus.setClickable(true);
-                    loadData();
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        delSection(mData.getSectionurl());
+                    }
+                })   //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
+                .setNeutralButton("初始化", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mData.setList(null);
+                        mData.setSuccess(0);
+                        mData.setFailed(0);
+                        mData.setStatus(DownloadStatus.STATE_START);
+                        mStatus.setText("下载");
+                        mStatus.setClickable(true);
+                        loadData();
+                    }
                 })  //通知最左按钮
                 .create()
                 .show();
@@ -243,8 +261,18 @@ class Download2ViewHolder extends AbstractViewHolder<DownSectionBean> {
         mAdapter.remove(getAdapterPosition());
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除本地文件")
-                .setNegativeButton("是", (DialogInterface dif, int j) -> FileUtil.deleteFile(path))   //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())      //通知最右按钮
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileUtil.deleteFile(path);
+                    }
+                })   //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
                 .create()
                 .show();
     }

@@ -1,9 +1,11 @@
-package seiko.neiko.ui.section2;
+package seiko.neiko.view;
 
 /**
  * Created by Seiko on 2017/1/23. Y
  */
 
-interface Section2View {
+public interface Section2View {
+
     void onItemClick(int position);
+
 }

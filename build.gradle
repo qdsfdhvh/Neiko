@@ -5,13 +5,11 @@ buildscript {
     }
     dependencies {
         //替换成最新的 gradle版本
-        classpath 'com.android.tools.build:gradle:2.4.0-alpha1'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         //用于：BindView
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.5.1'
         //用于：java1.8
-        classpath 'me.tatarka:gradle-retrolambda:3.2.0'
-        //用于：快速打包
-        classpath 'com.mcxiaoke.gradle:packer-ng:1.0.8'
+        //classpath 'me.tatarka:gradle-retrolambda:3.2.0'
         //用于：zlc
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
@@ -21,10 +19,12 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url "https://jitpack.io"
-        }
+        maven { url "https://jitpack.io" }
     }
+//    tasks.withType(JavaCompile) {
+//        sourceCompatibility = 1.7
+//        targetCompatibility = 1.7
+//    }
 }
 
 task clean(type: Delete) {

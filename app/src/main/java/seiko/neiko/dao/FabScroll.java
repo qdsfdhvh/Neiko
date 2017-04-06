@@ -2,10 +2,11 @@ package seiko.neiko.dao;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 
-import rx.Observable;
+import com.jakewharton.rxbinding2.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView;
+
+import io.reactivex.functions.Consumer;
 import seiko.neiko.widget.fab.FloatingActionButton;
 import seiko.neiko.widget.fab.FloatingActionMenu;
 
@@ -23,15 +24,18 @@ public class FabScroll {
     private FabScroll(FloatingActionButton fab) {this.fab = fab;}
 
     private void rxView(RecyclerView recView) {
-        RxRecyclerView.scrollEvents(recView).subscribe((RecyclerViewScrollEvent event) -> {
-            boolean safe = Math.abs(event.dy()) > 10;
-            if (safe) {
-                if (event.dy() > 0) {
-                    if (menu != null) menu.hideMenu(true);
-                    if (fab  != null) fab.hide(true);
-                } else {
-                    if (menu != null) menu.showMenu(true);
-                    if (fab  != null) fab.show(true);
+        RxRecyclerView.scrollEvents(recView).subscribe(new Consumer<RecyclerViewScrollEvent>() {
+            @Override
+            public void accept(RecyclerViewScrollEvent event) throws Exception {
+                boolean safe = Math.abs(event.dy()) > 10;
+                if (safe) {
+                    if (event.dy() > 0) {
+                        if (menu != null) menu.hideMenu(true);
+                        if (fab  != null) fab.hide(true);
+                    } else {
+                        if (menu != null) menu.showMenu(true);
+                        if (fab  != null) fab.show(true);
+                    }
                 }
             }
         });

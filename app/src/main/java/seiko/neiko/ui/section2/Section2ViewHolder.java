@@ -1,6 +1,5 @@
 package seiko.neiko.ui.section2;
 
-import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,8 +74,18 @@ class Section2ViewHolder extends AbstractViewHolder<TxtModel> {
         }
         if (getAdapterPosition() == adapter.getItemCount() - 1 && adapter.dtype == 2) {
             bts.setVisibility(View.VISIBLE);
-            bt1.setOnClickListener((View v) -> adapter.getMbtClick().onItemClick(1));
-            bt2.setOnClickListener((View v) -> adapter.getMbtClick().onItemClick(-1));
+            bt1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapter.getMbtClick().onItemClick(1);
+                }
+            });
+            bt2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapter.getMbtClick().onItemClick(-1);
+                }
+            });
         } else {
             bts.setVisibility(View.GONE);
         }

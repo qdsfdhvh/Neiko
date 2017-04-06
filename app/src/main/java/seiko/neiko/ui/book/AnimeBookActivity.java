@@ -14,9 +14,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.view.RxView;
+
+import com.jakewharton.rxbinding2.view.RxView;
+
+import org.noear.sited.SdSourceCallback;
 
 import butterknife.BindView;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.SourceApi;
 import seiko.neiko.glide.ImageLoader;
@@ -30,12 +34,12 @@ import seiko.neiko.dao.mIntent;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.utils.FileUtil;
 import seiko.neiko.viewModels.BookViewModel;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.app.BaseSwipeLayout;
 import seiko.neiko.widget.fab.FloatingActionMenu;
 
 import static seiko.neiko.dao.mPath.getBookCachePath;
 
-public class AnimeBookActivity extends SwipeLayoutBase {
+public class AnimeBookActivity extends BaseSwipeLayout {
 
     public static BookModel m;
 
@@ -70,8 +74,7 @@ public class AnimeBookActivity extends SwipeLayoutBase {
     public int getLayoutId() {return R.layout.activity_book;}
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         mContext = this;
 
         source = SourceApi.getDefault().getByUrl(m.url);
@@ -96,12 +99,15 @@ public class AnimeBookActivity extends SwipeLayoutBase {
 
     private void RxAndroid() {
         //修改阅读记录
-        addSubscription(RxEvent.EVENT_SECTION1_SAVE, (RxEvent event) -> {
-            String url = (String) event.getData();
-            int lastS = (int) event.getData(1);
+        addSubscription(RxEvent.EVENT_SECTION1_SAVE, new Consumer<RxEvent>() {
+            @Override
+            public void accept(RxEvent event) throws Exception {
+                String url = (String) event.getData();
+                int lastS = (int) event.getData(1);
 
-            adapter.setLast_surl(url);
-            recView.smoothScrollToPosition(lastS);
+                adapter.setLast_surl(url);
+                recView.smoothScrollToPosition(lastS);
+            }
         });
     }
 
@@ -121,17 +127,20 @@ public class AnimeBookActivity extends SwipeLayoutBase {
             viewModel = new BookViewModel(source.title, m.url, m.dtype);
         viewModel.clear();
 
-        source.getNodeViewModel(viewModel, true, m.url, source.book(m.url), (code) -> {
-            if (code == 1) {
-                if (viewModel.sectionList.size() > 0)
-                    FileUtil.save(path, viewModel);
+        source.getNodeViewModel(viewModel, true, m.url, source.book(m.url), new SdSourceCallback() {
+            @Override
+            public void run(Integer code) {
+                if (code == 1) {
+                    if (viewModel.sectionList.size() > 0)
+                        FileUtil.save(path, viewModel);
 
-                if (m != null) {
-                    DoBindingView();
+                    if (m != null) {
+                        DoBindingView();
+                    }
+                } else {
+                    gone(nowread2);  //隐藏加载界面
+                    toast("链接失败");
                 }
-            } else {
-                gone(nowread2);  //隐藏加载界面
-                toast("链接失败");
             }
         });
     }
@@ -181,12 +190,12 @@ public class AnimeBookActivity extends SwipeLayoutBase {
 
     /* 读取记录 */
     private void getLastSection() {
-        final int lastS = DbApi.getBookLastLookSection(viewModel.bookKey);
+        final int lastS = DbApi.getBookLastLookSection(viewModel.bookUrl);
         if (lastS > 3) {
             recView.scrollToPosition(lastS - 3);//无动画，可以主动触发
         }
 
-        final String last_surl = DbApi.getLastBookUrl(viewModel.bookKey);
+        final String last_surl = DbApi.getLastBookUrl(viewModel.bookUrl);
         adapter.setLast_surl(last_surl);
     }
 
@@ -208,11 +217,21 @@ public class AnimeBookActivity extends SwipeLayoutBase {
 
         rxView(R.id.book_intro);   /* 简介 */
         rxView(R.id.book_name);    /* 续看 */
-        RxView.longClicks(fab_menu.get()).subscribe((Void a) -> mIntent.Intent_Web(this, viewModel.bookUrl));   /* 浏览器打开 */
+        RxView.longClicks(fab_menu.get()).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                mIntent.Intent_Web(AnimeBookActivity.this, viewModel.bookUrl);
+            }
+        });/* 浏览器打开 */
     }
 
-    private void rxView(int id) {
-        RxView.clicks(findViewById(id)).subscribe((Void a) -> setFab(id));
+    private void rxView(final int id) {
+        RxView.clicks(findViewById(id)).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                setFab(id);
+            }
+        });
     }
 
     private void setFab(int id) {
@@ -224,7 +243,7 @@ public class AnimeBookActivity extends SwipeLayoutBase {
         switch (id) {
             case R.id.fab_download:
                 View down = inflate(R.layout.dialog_book_download, R.id.dialog);
-                new DialogDown(down, viewModel, source);
+                new DialogDown(this, down, viewModel, source);
                 break;
             case R.id.fab_refresh:
                 adapter.clear();
@@ -237,16 +256,21 @@ public class AnimeBookActivity extends SwipeLayoutBase {
                 break;
             case R.id.fab_setting:
                 View setting = inflate(R.layout.dialog_book_setting, R.id.dialog);
-                new DialogSetting(setting, viewModel.bookKey);
+                new DialogSetting(setting, viewModel.bookUrl, m.dtype);
                 break;
             case R.id.book_intro:
                 new AlertDialog.Builder(mContext).setMessage(viewModel.intro)
-                        .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())  //通知最右按钮
+                        .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })  //通知最右按钮
                         .create()
                         .show();
                 break;
             case R.id.book_name:
-                int lastS = DbApi.getBookLastLookSection(viewModel.bookKey);
+                int lastS = DbApi.getBookLastLookSection(viewModel.bookUrl);
                 if (lastS < 0) {
                     if (viewModel.sectionList.size() > 0)
                         lastS = viewModel.sectionList.size() - 1;

@@ -40,7 +40,7 @@ public class mIntent {
     /** 首页 -> 目录 */
     public static void Intent_Main_Book(Context from, Book book) {
         if (SourceApi.getDefault().readSited(from, book.getSource())) {
-            AnimeBookActivity.m = new BookModel(-1, book.getUrl(), book.getLogo());
+            AnimeBookActivity.m = new BookModel(book.getType(), book.getUrl(), book.getLogo());
             Intent intent = new Intent(from, AnimeBookActivity.class);
             from.startActivity(intent);
         }
@@ -148,7 +148,7 @@ public class mIntent {
 
     public static void Intent_MX(Context from, String url) {
 //        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Intent intent = new Intent().setDataAndType(Uri.parse(url), "video/*");
+        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/*");
         from.startActivity(intent);
     }
 

@@ -24,10 +24,11 @@ class DialogTagPage {
     private AlertDialog alertDialog;
     private TagActivity activity;
 
-    private DialogTagPage(View view, TagActivity from, int page) {
+    private DialogTagPage(View view, TagActivity from, String page) {
         ButterKnife.bind(this, view);
         activity = from;
-        et.setText(String.valueOf(page));
+        et.setText(page);
+        et.setSelection(page.length());
         alertDialog = new AlertDialog.Builder(view.getContext())
                 .setView(view)
                 .setCancelable(true)
@@ -37,7 +38,7 @@ class DialogTagPage {
 
     static void create(TagActivity from, int page) {
         View view = LayoutInflater.from(from).inflate(R.layout.dialog_button, (ViewGroup) from.findViewById(R.id.dialog));
-        new DialogTagPage(view, from, page);
+        new DialogTagPage(view, from, String.valueOf(page));
     }
 
     @OnClick(R.id.center)

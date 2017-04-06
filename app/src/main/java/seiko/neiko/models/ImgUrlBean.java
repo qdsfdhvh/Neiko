@@ -1,30 +1,46 @@
 package seiko.neiko.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import zlc.season.practicalrecyclerview.ItemType;
 
 /**
  * Created by Seiko on 2016/11/25. YiKu
  */
 
-public class ImgUrlBean implements ItemType {
+public class ImgUrlBean implements ItemType, Parcelable {
 
     private String url;
     private int index;
+    private String path;
+
+    public ImgUrlBean() {
+
+    }
 
     public void setIndex(int index) {
         this.index = index;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public int getIndex() {
         return index;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public String getUrl() {
         return url;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     @Override
@@ -32,32 +48,34 @@ public class ImgUrlBean implements ItemType {
         return 0;
     }
 
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
+    //===================================
 
-//    @Override
-//    public void writeToParcel(Parcel parcel, int i) {
-//        parcel.writeString(url);
-//        parcel.writeInt(index);
-//    }
-//
-//
-//    public static final Creator<ImgUrlBean> CREATOR = new Creator<ImgUrlBean>() {
-//        @Override
-//        public ImgUrlBean createFromParcel(Parcel in) {
-//
-//            ImgUrlBean part = new ImgUrlBean();
-//            part.setUrl(in.readString());
-//            part.setIndex(in.readInt());
-//
-//            return part;
-//        }
-//
-//        @Override
-//        public ImgUrlBean[] newArray(int size) {
-//            return new ImgUrlBean[size];
-//        }
-//    };
+    private ImgUrlBean(Parcel in) {
+        url = in.readString();
+        index = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(url);
+        dest.writeInt(index);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ImgUrlBean> CREATOR = new Creator<ImgUrlBean>() {
+        @Override
+        public ImgUrlBean createFromParcel(Parcel in) {
+            return new ImgUrlBean(in);
+        }
+
+        @Override
+        public ImgUrlBean[] newArray(int size) {
+            return new ImgUrlBean[size];
+        }
+    };
+
 }

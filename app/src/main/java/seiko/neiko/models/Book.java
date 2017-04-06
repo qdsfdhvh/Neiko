@@ -28,12 +28,6 @@ public class Book implements ItemType {
     private String path;
     private int index;
 
-    private int section_count;
-    private String last_surl;
-    private int last_pidx;
-    private int last_page;
-
-
     private int width;
     private int height;
 
@@ -213,28 +207,6 @@ public class Book implements ItemType {
         return number;
     }
 
-    //==============================================
-
-    public int getSection_count() {
-        return section_count;
-    }
-
-    public String getLast_surl() {
-        return last_surl;
-    }
-
-    public int getLast_pidx() {
-        return last_pidx;
-    }
-
-    public int getLast_page() {
-        return last_page;
-    }
-
-    @Override
-    public int itemType() {
-        return 0;
-    }
 
     //==============================================
 
@@ -276,5 +248,11 @@ public class Book implements ItemType {
 
     public int getHeight() {
         return height;
+    }
+
+
+    @Override
+    public int itemType() {
+        return 0;
     }
 }

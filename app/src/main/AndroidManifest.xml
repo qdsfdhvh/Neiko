@@ -120,7 +120,7 @@
         <activity
             android:screenOrientation="portrait"
             android:hardwareAccelerated="true"
-            android:name=".ui.sited.SitedActivity"/>
+            android:name=".ui.sited.SitedItemActivity"/>
 
         <activity
             android:hardwareAccelerated="true"

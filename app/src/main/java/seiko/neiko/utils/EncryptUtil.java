@@ -1,5 +1,8 @@
 package seiko.neiko.utils;
 
+import android.util.Base64;
+
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 /**
@@ -7,7 +10,8 @@ import java.security.MessageDigest;
  */
 
 public class EncryptUtil {
-    /*生成MD5值*/
+
+    /* 生成MD5值 */
     public static String md5(String code) {
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',  'e', 'f'};
 
@@ -36,10 +40,15 @@ public class EncryptUtil {
         }
         return s;
     }
+    
+    //============================================
+    /* Base64 */
+    public static String b64_encode(String text) {
+        return Base64.encodeToString(text.getBytes(Charset.forName("UTF-8")),Base64.NO_WRAP);
+    }
 
-    /*生成sha1值*/
-//    public static String sha1(String code)
-//    {
-//        return null;
-//    }
+    public static String b64_decode(String code){
+        byte[] temp = Base64.decode(code.getBytes(), Base64.NO_WRAP);
+        return new String(temp);
+    }
 }

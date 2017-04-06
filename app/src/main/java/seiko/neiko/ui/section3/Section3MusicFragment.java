@@ -23,7 +23,7 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.OnClick;
 import seiko.neiko.R;
-import seiko.neiko.app.FragmentBase;
+import seiko.neiko.app.BaseFragment;
 import seiko.neiko.utils.ImgBlurUtil;
 import seiko.neiko.widget.AlbumCoverView;
 
@@ -31,7 +31,7 @@ import seiko.neiko.widget.AlbumCoverView;
  * Created by Seiko on 2016/12/22. Y
  */
 
-public class Section3MusicFragment extends FragmentBase implements
+public class Section3MusicFragment extends BaseFragment implements
         SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener {
 
     @BindView(R.id.app_music_box)
@@ -66,11 +66,11 @@ public class Section3MusicFragment extends FragmentBase implements
     public int getLayoutId() {return R.layout.fragment_section3_music;}
 
     @Override
-    public void initView() {
-        Bundle bundle = getArguments();
-        String url = bundle.getString("url");
-        String title = bundle.getString("title");
-        String logo = bundle.getString("logo");
+    public void initViews(Bundle bundle) {
+        Bundle args = getArguments();
+        String url = args.getString("url");
+        String title = args.getString("title");
+        String logo = args.getString("logo");
 
         tvTitle.setText(title);
         AudioManager mAudioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -82,13 +82,16 @@ public class Section3MusicFragment extends FragmentBase implements
             mediaPlayer.setDataSource(url);
             //mediaPlayer.prepare();  //准备
             mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> {
-                mp.start();
-                isPlaying = true;
-                ivPlay.setSelected(true);
-                mAlbumCoverView.start();
-                tvTotalTime.setText(formatTime(mediaPlayer.getDuration()));
-                sbProgress.setMax(mediaPlayer.getDuration());   //设置进度条
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                    isPlaying = true;
+                    ivPlay.setSelected(true);
+                    mAlbumCoverView.start();
+                    tvTotalTime.setText(formatTime(mediaPlayer.getDuration()));
+                    sbProgress.setMax(mediaPlayer.getDuration());   //设置进度条
+                }
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -186,11 +189,14 @@ public class Section3MusicFragment extends FragmentBase implements
         timer.schedule(timerTask,0,500);
     }
 
-    private void setProgress(int i) {
+    private void setProgress(final int i) {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                tvCurrentTime.setText(formatTime(i));
-                sbProgress.setProgress(i);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    tvCurrentTime.setText(formatTime(i));
+                    sbProgress.setProgress(i);
+                }
             });
         }
     }

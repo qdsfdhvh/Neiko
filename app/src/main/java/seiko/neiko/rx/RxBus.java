@@ -3,6 +3,7 @@ package seiko.neiko.rx;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
@@ -38,7 +39,12 @@ public class RxBus {
     // 根据传递的 eventType 类型返回特定类型(eventType)的 被观察者
     public Flowable<RxEvent> toObservable(final int type) {
         return bus.ofType(RxEvent.class)
-                .filter((x) -> x.getType() == type)
+                .filter(new Predicate<RxEvent>() {
+                    @Override
+                    public boolean test(RxEvent event) throws Exception {
+                        return event.getType() == type;
+                    }
+                })
                 .toFlowable(BackpressureStrategy.BUFFER)
                 .observeOn(AndroidSchedulers.mainThread());
     }

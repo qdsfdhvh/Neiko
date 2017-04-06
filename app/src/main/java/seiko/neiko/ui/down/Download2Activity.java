@@ -8,6 +8,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.db.DbApi;
@@ -17,8 +18,7 @@ import seiko.neiko.rx.RxEvent;
 import seiko.neiko.models.DownBookBean;
 import seiko.neiko.models.DownSectionBean;
 import seiko.neiko.service.DownloadManger;
-import seiko.neiko.app.SwipeLayoutBase;
-import seiko.neiko.widget.fab.FloatingActionButton;
+import seiko.neiko.app.BaseSwipeLayout;
 import seiko.neiko.widget.fab.FloatingActionMenu;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
@@ -26,7 +26,7 @@ import zlc.season.practicalrecyclerview.PracticalRecyclerView;
  * Created by Seiko on 2016/11/21. YiKu
  */
 
-public class Download2Activity extends SwipeLayoutBase {
+public class Download2Activity extends BaseSwipeLayout {
 
     public static DownBookBean data;
 
@@ -36,8 +36,6 @@ public class Download2Activity extends SwipeLayoutBase {
     PracticalRecyclerView recView;
     @BindView(R.id.fab_menu)
     FloatingActionMenu fab_menu;
-    @BindView(R.id.fab_play)
-    FloatingActionButton fab_play;
 
     private Download2Adapter adapter;
     private DownloadManger manager;
@@ -46,18 +44,15 @@ public class Download2Activity extends SwipeLayoutBase {
     public int getLayoutId() {return R.layout.activity_down2;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         mTitle.setText(data.getTitle());
-
-        RecView();
+        setRecView();
         loadData();
         RxAndroid();
-        SetAdatper();
-        pause_play();
+        loadSet();
     }
 
-    private void RecView() {
+    private void setRecView() {
         manager = DownloadManger.create(this);
         adapter = new Download2Adapter(manager);
         recView.setLayoutManager(new LinearLayoutManager(this));
@@ -65,10 +60,10 @@ public class Download2Activity extends SwipeLayoutBase {
         FabScroll.showFab(recView.get(), fab_menu);
     }
 
-    private void SetAdatper() {
-        adapter.setLast_surl(DbApi.getLastBookUrl(data.getBkey()));
+    private void loadSet() {
+        adapter.setLast_surl(DbApi.getLastBookUrl(data.getUrl()));
 
-        int lastS = DbApi.getBookLastLookSection(data.getBkey());
+        int lastS = DbApi.getBookLastLookSection(data.getUrl());
         if (lastS > 3) {
             recView.get().scrollToPosition(lastS - 3);//无动画，可以主动触发
         }
@@ -93,33 +88,15 @@ public class Download2Activity extends SwipeLayoutBase {
 
     @OnClick(R.id.fab_play)
     void fab_play() {
-        if (!fab_play.isSelected())
-            start_play();
-        else
-            pause_play();
-        setDownload();
-    }
-
-
-
-    //不下载时的状态
-    private void pause_play() {
-        fab_play.setSelected(false);
-        fab_play.setLabelText("下载");
-    }
-
-    //下载时的状态
-    private void start_play() {
-        fab_play.setSelected(true);
-        fab_play.setLabelText("暂停");
-    }
-
-
-    //============================================
-    /** 批量下载操作 */
-    private void setDownload() {
         for (DownSectionBean bean : adapter.getData()) {
-            manager.setDownload(bean);
+            manager.addDownload(bean);
+        }
+    }
+
+    @OnClick(R.id.fab_pause)
+    void fab_pause() {
+        for (DownSectionBean bean : adapter.getData()) {
+            manager.pauseDownload(bean);
         }
     }
 
@@ -127,21 +104,23 @@ public class Download2Activity extends SwipeLayoutBase {
     /** RxJava */
     private void RxAndroid() {
         //修改阅读记录
-        addSubscription(RxEvent.EVENT_SECTION1_SAVE, (RxEvent event) -> {
-            String url = (String) event.getData();
-            adapter.setLast_surl(url);
+        addSubscription(RxEvent.EVENT_SECTION1_SAVE, new Consumer<RxEvent>() {
+            @Override
+            public void accept(RxEvent event) throws Exception {
+                String url = (String) event.getData();
+                adapter.setLast_surl(url);
+            }
         });
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
+        super.onStop();
         //重绘下载界面1
         RxBus.getDefault().post(new RxEvent(RxEvent.EVENT_DOWN1_PROCESS));
         //注销service
         manager.unbindService();
 
         adapter.unsubscribe();
-        super.onDestroy();
     }
-
 }

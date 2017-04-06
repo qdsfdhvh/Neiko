@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -22,6 +23,7 @@ import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.utils.ColorUtil;
 import seiko.neiko.widget.ScaleImageView;
 import seiko.neiko.widget.TextDrawable;
+import seiko.neiko.widget.photo.PhotoView;
 
 /**
  * Created by Seiko on 2016/10/23. YiKu
@@ -50,7 +52,7 @@ public class ImageLoader {
         display(context, iv, url, name, null);
     }
 
-    public void display(Context context, ImageView iv, String url, String name, final String refererUrl) {
+    public void display(Context context, ImageView iv, String url, String name, String refererUrl) {
         //占位图(必须有)
         TextDrawable drawable = getTextDrawable(name);
         iv.setImageDrawable(drawable);
@@ -63,14 +65,13 @@ public class ImageLoader {
                 .dontTransform()
                 .placeholder(drawable)
                 .into(iv);
-
     }
 
-    public void display(Context context, ScaleImageView iv, String url, String name) {
+    public void display(Context context, final ScaleImageView iv, String url, String name) {
         display(context, iv, url, name, null);
     }
 
-    public void display(Context context, ScaleImageView iv, String url, String name, String refererUrl) {
+    public void display(Context context, final ScaleImageView iv, String url, String name, String refererUrl) {
         //占位图(必须有)
         TextDrawable drawable = getTextDrawable(name);
         iv.setImageDrawable(drawable);
@@ -90,9 +91,105 @@ public class ImageLoader {
                     }
                 });
     }
+    //===========================================================
+    /** Section点击模式专用 */
+    public void display6(View v, ImageView iv1, String url, String refererUrl) {
+        //占位图(必须有)
+        TextDrawable drawable = getTextDrawable(null);
+        iv1.setImageDrawable(drawable);
+        //链接是否存在
+        if (TextUtils.isEmpty(url)) return;
+        //开始加载图片
+        getRequest(v.getContext(), url, refererUrl)
+                .asBitmap()
+                .dontAnimate()
+                .dontTransform()
+                .placeholder(drawable)
+                .into(new PageViewTarget(v, iv1));
+    }
+
+    private class PageViewTarget extends SimpleTarget<Bitmap> {
+
+        private LinearLayout layout;
+        private ImageView iv1;
+        private int width;
+        private int height;
+        private float ratio;
+
+        PageViewTarget(View v, ImageView iv1) {
+            layout = (LinearLayout) v.findViewById(R.id.layout);
+            this.iv1 = iv1;
+        }
+
+        @Override
+        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+            width  = resource.getWidth();
+            height = resource.getHeight();
+            ratio = (float) width / height;
+
+            if (height <= 4096)
+                isOrdImg(resource);
+            else
+                isLogImg(resource);
+
+        }
+
+        private void isOrdImg(Bitmap bitmap) {
+            Log.d(TAG, "width=" + width + ";height=" + height + ";ratio=" + ratio);
+            switch (cut_pic) {
+                case 0:
+                    iv1.setImageBitmap(bitmap);
+                    break;
+                case 1:
+                case 2:
+                    if (width < 900 || ratio < 1.15 || ratio >1.66 || width > 2000) {
+                        iv1.setImageBitmap(bitmap);
+                    } else {
+                        Bitmap H1 = Bitmap.createBitmap(bitmap, 0, 0, width/2, height);        //左边
+                        Bitmap H2 = Bitmap.createBitmap(bitmap, width/2, 0, width/2, height);  //右边
+                        ImageView iv2 = addImageView();
+
+                        switch (cut_pic) {
+                            case 1:
+                                iv1.setImageBitmap(H2);
+                                iv2.setImageBitmap(H1);
+                                break;
+                            case 2:
+                                iv1.setImageBitmap(H1);
+                                iv2.setImageBitmap(H2);
+                                break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void isLogImg(Bitmap bitmap) {
+            iv1.setImageBitmap(bitmap);
+        }
+
+        private ImageView addImageView() {
+            ViewGroup.LayoutParams params1 = layout.getLayoutParams();
+            params1.height *= 2;
+            layout.setLayoutParams(params1);
+
+            PhotoView iv = new PhotoView(layout.getContext());
+            iv.setLayoutParams(iv1.getLayoutParams());
+            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            iv.setAdjustViewBounds(true);
+
+            //根据回收策略 如果已经添加过iv则删除（暂时）
+            if (layout.getChildCount() >= 2) {  //不超过4096的图片才运行
+                layout.removeView(layout.getChildAt(1));
+            }
+
+            layout.addView(iv); //添加到layout
+            return iv;
+        }
+    }
 
     //===========================================================
-    /** Section系列专用 */
+    /** Section流水模式专用 */
     public void display9(final View v, final ScaleImageView iv1, final String url, final String refererUrl) {
         //占位图(必须有)
         TextDrawable drawable = getTextDrawable(null);
@@ -105,11 +202,11 @@ public class ImageLoader {
                 .dontAnimate()
                 .dontTransform()
                 .placeholder(drawable)
-                .into(new DriverViewTarget(v, iv1));
+                .into(new StreamViewTarget(v, iv1));
     }
 
 
-    private class DriverViewTarget extends SimpleTarget<Bitmap> {
+    private class StreamViewTarget extends SimpleTarget<Bitmap> {
 
         private LinearLayout layout;
         private ScaleImageView iv;
@@ -117,7 +214,7 @@ public class ImageLoader {
         private int height;
         private float ratio;
 
-        DriverViewTarget(View v, ScaleImageView view) {
+        StreamViewTarget(View v, ScaleImageView view) {
             layout = (LinearLayout) v.findViewById(R.id.layout);
             this.iv = view;
         }
@@ -135,7 +232,7 @@ public class ImageLoader {
         }
 
         /** 处理：普通或者需要对半切的图片 */
-        private float isOrdImg(Bitmap bitmap, ScaleImageView iv1) {
+        private void isOrdImg(Bitmap bitmap, ScaleImageView iv1) {
             Log.d(TAG, "width=" + width + ";height=" + height + ";ratio=" + ratio);
             switch (cut_pic) {
                 case 0:
@@ -168,11 +265,10 @@ public class ImageLoader {
                     }
                     break;
             }
-            return ratio;
         }
 
         /** 处理：长度大于4096的图片 */
-        private float isLogImg(Bitmap bitmap, ScaleImageView iv1) {
+        private void isLogImg(Bitmap bitmap, ScaleImageView iv1) {
             Bitmap V1 = Bitmap.createBitmap(bitmap, 0 ,0, width, 4096);
             iv1.setImageBitmap(V1);
 
@@ -191,7 +287,6 @@ public class ImageLoader {
 
             }
             iv1.requestLayout();
-            return ratio;
         }
 
         private ScaleImageView addImageView(boolean isTwo) {

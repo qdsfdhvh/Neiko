@@ -1,6 +1,5 @@
 package seiko.neiko.dao;
 
-import android.app.Activity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -37,10 +36,10 @@ public class mTouch extends GestureDetector.SimpleOnGestureListener {
         }
 
         if (!touchListener.control()) {
-            if (x1<width/3) touchListener.setScroll(move, -1);
-            else if(x1>width/3*2) touchListener.setScroll(move, 1);
-            else if(x1>width/3 && x1<width/3*2 && y1<height/3) touchListener.setScroll(move, -1);
-            else if(x1>width/3 && x1<width/3*2 && y1>height/3*2) touchListener.setScroll(move, 1);
+            if (x1<width/3) touchListener.setScroll(height, move, -1);
+            else if(x1>width/3*2) touchListener.setScroll(height, move, 1);
+            else if(x1>width/3 && x1<width/3*2 && y1<height/3) touchListener.setScroll(height, move, -1);
+            else if(x1>width/3 && x1<width/3*2 && y1>height/3*2) touchListener.setScroll(height, move, 1);
         }
 
         return super.onSingleTapConfirmed(e);
@@ -59,7 +58,7 @@ public class mTouch extends GestureDetector.SimpleOnGestureListener {
 
         boolean control();
 
-        void setScroll(int move, int t);
+        void setScroll(int height, int move,  int t);
 
     }
 }

@@ -1,4 +1,6 @@
-package seiko.neiko.view;
+package seiko.neiko.app;
+
+import android.os.Bundle;
 
 /**
  * Created by Seiko on 2016/11/18. YiKu
@@ -6,5 +8,9 @@ package seiko.neiko.view;
  */
 
 public interface BaseView {
+
     int getLayoutId();
+
+    void initViews(Bundle bundle);
+
 }

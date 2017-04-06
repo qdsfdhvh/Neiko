@@ -14,11 +14,12 @@ class TagAdapter extends AbstractAdapter<BookModel, TagViewHolder> {
 
     @Override
     protected TagViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {
-        return new TagViewHolder(parent, this);
+        return new TagViewHolder(parent);
     }
 
     @Override
     protected void onNewBindViewHolder(TagViewHolder holder, int position) {
         holder.setData(get(position));
     }
+
 }

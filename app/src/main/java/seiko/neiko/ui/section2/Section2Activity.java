@@ -7,27 +7,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 import org.noear.sited.SdNode;
+import org.noear.sited.SdSourceCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.dao.mTouch;
@@ -38,15 +36,16 @@ import seiko.neiko.rx.RxEvent;
 import seiko.neiko.dao.mReceiver;
 import seiko.neiko.utils.EncryptUtil;
 import seiko.neiko.utils.HintUtil;
+import seiko.neiko.view.Section2View;
 import seiko.neiko.viewModels.Section2ViewModel;
-import seiko.neiko.app.ActivityBase;
+import seiko.neiko.app.BaseActivity;
 import seiko.neiko.widget.TextDrawable;
 
 /**
  * Created by Seiko on 2017/1/22. Y
  */
 
-public class Section2Activity extends ActivityBase implements Section2View, mTouch.TouchListener {
+public class Section2Activity extends BaseActivity implements Section2View, mTouch.TouchListener {
 
     public static Section2Model m;
 
@@ -75,15 +74,14 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     @Override
     protected void onResume() {
         super.onResume();
-        setImmersiveFullscreen(true); //全屏
+        setImmersiveFullscreen(); //全屏
     }
 
     @Override
     public int getLayoutId() {return R.layout.activity_section2;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         setModel();
         setRecView();
         DoLoadViewModel(m.sec_name, m.sec_url, true); //首次加载
@@ -124,13 +122,16 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
         recView.setLayoutManager(llm);
         recView.setHasFixedSize(true);
         recView.setAdapter(adapter);
-        RxRecyclerView.scrollEvents(recView).subscribe((RecyclerViewScrollEvent event) -> {
-            int id = llm.findFirstVisibleItemPosition();
-            seekBar.setProgress(id + 1);
+        RxRecyclerView.scrollEvents(recView).subscribe(new Consumer<RecyclerViewScrollEvent>() {
+            @Override
+            public void accept(RecyclerViewScrollEvent recyclerViewScrollEvent) throws Exception {
+                int id = llm.findFirstVisibleItemPosition();
+                seekBar.setProgress(id + 1);
+            }
         });
     }
 
-    private void DoLoadViewModel(String name, String url, boolean loadsave) {
+    private void DoLoadViewModel(String name, String url, final boolean loadsave) {
         viewModel.clear();
         viewModel.addTitleItem(name, 2);
 
@@ -139,9 +140,12 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
         }
         title_indexs.setText(name);
 
-        source.getNodeViewModel(viewModel, false, url, config, (code) -> {
-            if (code == 1) {
-                initRec(viewModel.items, loadsave);
+        source.getNodeViewModel(viewModel, false, url, config, new SdSourceCallback() {
+            @Override
+            public void run(Integer code) {
+                if (code == 1) {
+                    initRec(viewModel.items, loadsave);
+                }
             }
         });
 
@@ -163,7 +167,7 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     //=============================================================
     /** 上一章&下一章 */
     @Override
-    public void onItemClick(int index) {
+    public void onItemClick(final int index) {
         switch (index) {
             case -1: toast("加载下一章"); break;
             case  1: toast("加载上一章"); break;
@@ -175,18 +179,21 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
         }
 
         nowload = true;
-        new Handler().postDelayed(() -> {
-            cp += index * t;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                cp += index * t;
 
-            if (isBottom(m.imgindex + cp)) {
-                cp -= index * t;
-                nowload = false;
-                return;
+                if (isBottom(m.imgindex + cp)) {
+                    cp -= index * t;
+                    nowload = false;
+                    return;
+                }
+
+                adapter.clear();
+                adapter.notifyDataSetChanged();
+                DoLoadViewModel(getName(), getUrl(), false);
             }
-
-            adapter.clear();
-            adapter.notifyDataSetChanged();
-            DoLoadViewModel(getName(), getUrl(), false);
         }, 500);
     }
 
@@ -208,10 +215,18 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     private GestureDetector gestureScanner;
     private void initDetector() {
         gestureScanner = new GestureDetector(this, new mTouch(this));
-        RxView.clicks(back).subscribe((Void aVoid) -> finish());
-        RxRecyclerView.scrollEvents(recView).subscribe((RecyclerViewScrollEvent event) -> {
-            id = llm.findFirstVisibleItemPosition();
-            seekBar.setProgress(id + 1);
+        RxView.clicks(back).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                onBackPressed();
+            }
+        });
+        RxRecyclerView.scrollEvents(recView).subscribe(new Consumer<RecyclerViewScrollEvent>() {
+            @Override
+            public void accept(RecyclerViewScrollEvent recyclerViewScrollEvent) throws Exception {
+                id = llm.findFirstVisibleItemPosition();
+                seekBar.setProgress(id + 1);
+            }
         });
     }
 
@@ -233,7 +248,7 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
     }
 
     @Override
-    public void setScroll(int move, int t) {
+    public void setScroll(int height, int move, int t) {
         recView.scrollBy(0, move * t);
         int index;
         if (move * t < 0) {
@@ -317,7 +332,7 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
         }
     }
 
-    private void addButton(int i, String[] bg) {
+    private void addButton(final int i, final String[] bg) {
         Button bt = new Button(this);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(100, 100);
         lp.leftMargin = 50;
@@ -330,9 +345,12 @@ public class Section2Activity extends ActivityBase implements Section2View, mTou
                 .buildRound(bg[0], Color.parseColor(bg[2]));
         bt.setBackground(drawable);
 
-        RxView.clicks(bt).subscribe((Void aVoid) -> {
-            setTheme(bg);
-            DbApi.setTextTheme(i);
+        RxView.clicks(bt).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                setTheme(bg);
+                DbApi.setTextTheme(i);
+            }
         });
         textTheme.addView(bt, lp);
     }

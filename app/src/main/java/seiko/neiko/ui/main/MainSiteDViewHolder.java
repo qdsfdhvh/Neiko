@@ -10,10 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.dao.mPath;
@@ -57,19 +58,30 @@ class MainSiteDViewHolder extends AbstractViewHolder<SourceModel> implements Sho
             card.setRadius(5);
         }
 
-        RxView.clicks(card).subscribe((Void aVoid) -> {
-            if (!adapter.isDelete()) {
-                mIntent.Intent_Main_Home(mContext, model);
-            } else {
-                new AlertDialog.Builder(mContext)
-                        .setMessage("是否删除插件："+ model.title)
-                        .setNegativeButton("是", (DialogInterface dif, int j) -> {
-                            del_home();
-                            HintUtil.show(model.title + "：已删除");  //通知
-                        })       //通知中间按钮
-                        .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())    //通知最右按钮
-                        .create()
-                        .show();
+        RxView.clicks(card).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                if (!adapter.isDelete()) {
+                    mIntent.Intent_Main_Home(mContext, model);
+                } else {
+                    new AlertDialog.Builder(mContext)
+                            .setMessage("是否删除插件："+ model.title)
+                            .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    del_home();
+                                    HintUtil.show(model.title + "：已删除");
+                                }
+                            })       //通知中间按钮
+                            .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })    //通知最右按钮
+                            .create()
+                            .show();
+                }
             }
         });
     }

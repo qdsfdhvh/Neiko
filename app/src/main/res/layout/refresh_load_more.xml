@@ -4,14 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent" >
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:paddingBottom="20dp"
         android:paddingTop="20dp" >
-
         <TextView
             android:id="@+id/loadstate_tv"
             android:gravity="center"
@@ -20,7 +18,5 @@
             android:layout_centerInParent="true"
             android:textColor="@color/white"
             android:textSize="16sp"/>
-
     </RelativeLayout>
-
 </RelativeLayout>

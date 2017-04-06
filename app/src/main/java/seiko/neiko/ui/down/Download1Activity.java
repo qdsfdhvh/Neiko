@@ -18,12 +18,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.dao.FabScroll;
 import seiko.neiko.dao.db.DownDbApi;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.app.BaseSwipeLayout;
 import seiko.neiko.widget.fab.FloatingActionMenu;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
@@ -33,7 +34,7 @@ import static seiko.neiko.dao.mPath.downPath;
  * Created by Seiko on 2016/11/12. YiKu
  */
 
-public class Download1Activity extends SwipeLayoutBase {
+public class Download1Activity extends BaseSwipeLayout {
 
     @BindView(R.id.title)
     TextView mTitle;
@@ -49,8 +50,7 @@ public class Download1Activity extends SwipeLayoutBase {
     public int getLayoutId() {return R.layout.activity_down1;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         mContext = this;
         mTitle.setText("下载(未完成)");
 
@@ -68,7 +68,12 @@ public class Download1Activity extends SwipeLayoutBase {
 
     private void RxAndroid() {
         //随着下载刷新界面 （暂时）
-        addSubscription(RxEvent.EVENT_DOWN1_PROCESS, (RxEvent event) -> mAdapter.notifyDataSetChanged());
+        addSubscription(RxEvent.EVENT_DOWN1_PROCESS, new Consumer<RxEvent>() {
+            @Override
+            public void accept(RxEvent event) throws Exception {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
 
@@ -76,8 +81,18 @@ public class Download1Activity extends SwipeLayoutBase {
     void onClick() {
         new AlertDialog.Builder(this)
                 .setMessage("是否删除全部")
-                .setNegativeButton("是", (DialogInterface dif, int j) -> delAll())      //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())        //通知最右按钮
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        delAll();
+                    }
+                })      //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })        //通知最右按钮
                 .create()
                 .show();
     }
@@ -90,8 +105,18 @@ public class Download1Activity extends SwipeLayoutBase {
 
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除本地文件")
-                .setNegativeButton("是", (DialogInterface dif, int j) -> FileUtil.deleteFile(downPath))   //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())      //通知最右按钮
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileUtil.deleteFile(downPath);
+                    }
+                })   //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
                 .create()
                 .show();
     }
@@ -134,7 +159,12 @@ public class Download1Activity extends SwipeLayoutBase {
             new AlertDialog.Builder(mContext)
                     .setTitle("设置")
                     .setView(view)
-                    .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())  //通知最右按钮
+                    .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })  //通知最右按钮
                     .create()
                     .show();
         }

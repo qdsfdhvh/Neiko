@@ -2,26 +2,20 @@ package seiko.neiko.ui.section1;
 
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import seiko.neiko.models.Book;
-import seiko.neiko.models.SizeModel;
+import seiko.neiko.models.ImgUrlBean;
 import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 /**
  * Created by Seiko on 2016/12/26. Y
  */
 
-class Section1FragmentSAdapter extends AbstractAdapter<Book, Section1FragmentSViewHolder> {
+class Section1FragmentSAdapter extends AbstractAdapter<ImgUrlBean, Section1FragmentSViewHolder> {
 
     private String refererUrl;
 
     Section1FragmentSAdapter(String refererUrl) {
         this.refererUrl = refererUrl;
     }
-
-    String getRefererUrl() {return refererUrl;}
 
     //=====================================
     @Override
@@ -33,5 +27,7 @@ class Section1FragmentSAdapter extends AbstractAdapter<Book, Section1FragmentSVi
     protected void onNewBindViewHolder(Section1FragmentSViewHolder holder, int position) {
         holder.setData(get(position));
     }
+
+    String ref() {return refererUrl;}
 
 }

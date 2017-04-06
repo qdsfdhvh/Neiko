@@ -27,15 +27,18 @@ class JsEngine {
         this.source = sd;
         this.engine = V8.createV8Runtime(null, app.getApplicationInfo().dataDir);
 
-        JavaVoidCallback callback = (final V8Object receiver, final V8Array parameters) -> {
-            if (parameters.length() > 0) {
-                Object arg1 = parameters.get(0);
+        JavaVoidCallback callback =new JavaVoidCallback() {
+            @Override
+            public void invoke(V8Object receiver, V8Array parameters) {
+                if (parameters.length() > 0) {
+                    Object arg1 = parameters.get(0);
 
-                Util.log(source, "JsEngine.print", (String) arg1);
+                    Util.log(source, "JsEngine.print", (String) arg1);
 
 
-                if (arg1 instanceof Releasable) {
-                    ((Releasable) arg1).release();
+                    if (arg1 instanceof Releasable) {
+                        ((Releasable) arg1).release();
+                    }
                 }
             }
         };

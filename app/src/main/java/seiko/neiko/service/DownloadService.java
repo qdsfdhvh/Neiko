@@ -1,31 +1,52 @@
 package seiko.neiko.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.LongSparseArray;
 
+import org.noear.sited.SdSourceCallback;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import okhttp.OkHttpProxy;
 import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import seiko.neiko.dao.SourceApi;
 import seiko.neiko.dao.db.DownDbApi;
+import seiko.neiko.dao.Extra;
+import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.models.DownSectionBean;
 import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.models.Pair;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.utils.FileUtil;
+import seiko.neiko.viewModels.Section1ViewModel;
 
+import static seiko.neiko.dao.mPath.getSectionBeanPath;
 import static seiko.neiko.dao.mPath.getSectionDownPath;
 import static seiko.neiko.dao.mPath.getSectionImgPath;
 
@@ -65,13 +86,20 @@ public class DownloadService extends Service {
     }
 
     public ExecutorService getExecutor() {
-        if (executor == null)
+        if (executor == null) {
             executor = Executors.newFixedThreadPool(max);
+        }
         return executor;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            List<DownSectionBean> list =  intent.getParcelableArrayListExtra(Extra.EXTRA_TASK);
+            for (DownSectionBean bean : list) {
+                addDownload(bean);
+            }
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -91,15 +119,16 @@ public class DownloadService extends Service {
 
         if (mWorkerArray.get(id) == null) {
             DownloadTask task = new DownloadTask(bean);
-            Future future = getExecutor().submit(task);
+            final Future future = getExecutor().submit(task);
             mWorkerArray.put(id, Pair.create(task, future));
         }
     }
+
     public synchronized void pauseDownload(long id) {
         Pair<DownloadTask, Future> pair = mWorkerArray.get(id);
         if (pair != null) {
             pair.first.stop(); //退出Runable
-            pair.first.RxStatus(DownloadStatus.STATE_PAUSED, pair.first.success, pair.first.failed); //并把进度返回
+            pair.first.RxStatus(DownloadStatus.STATE_PAUSED); //并把进度返回
             pair.second.cancel(true);
             mWorkerArray.remove(id);
         }
@@ -111,10 +140,6 @@ public class DownloadService extends Service {
             pair.second.cancel(true);
             mWorkerArray.remove(id);
         }
-
-        if (mWorkerArray.size() == 0) {
-            mWorkerArray.clear();
-        }
     }
 
     //====================================
@@ -124,32 +149,40 @@ public class DownloadService extends Service {
         private DownSectionBean task;
         private int success;
         private int failed;
+        private int size;
         private boolean isrunning;
 
         DownloadTask(DownSectionBean task) {
             this.task = task;
             isrunning = false;
             success = task.getSuccess();
-            failed  = 0;                 //重新开始统计错误
+            failed = 0;     //重新开始统计错误
             RxStatus(DownloadStatus.STATE_WAITING);
         }
-        //停止
-        void stop() {isrunning = false;}
 
-        /** 图片下载 */
+        //停止
+        void stop() {
+            isrunning = false;
+        }
+
+        /**
+         * 图片下载
+         */
         @Override
-        public void run() {StartDown();}
+        public void run() {
+            StartDown();
+        }
 
         private void StartDown() {
-            Log.d(TAG, "开始下载:" + task.getSection());
+            Log.d(TAG, "开始下载:" + task.getSection() + task.getList().size());
             try {
                 isrunning = true;
-                int size = task.getList().size();
-                RxStatus(DownloadStatus.STATE_DOWNLOADING, size);
+                size = task.getList().size();
+//                RxStatus(DownloadStatus.STATE_DOWNLOADING, size);
                 String path = getSectionDownPath(task);  //本章节的路径
 
                 //开始下载
-                for (int i = success;i < size; ++i) {
+                for (int i = success; i < size; ++i) {
                     ImgUrlBean bean = task.getList().get(i);
 
                     int count = 0;    // 单页下载错误次数
@@ -163,9 +196,9 @@ public class DownloadService extends Service {
                             isOk = RequestAndWrite(path, request, bean);
                         }
                         //链接下载错误
-                        if (count == 4 && !isOk) {
+                        if (count > 3 && !isOk) {
                             failed++;
-                            setIndex();
+                            RxStatus(DownloadStatus.STATE_PROCRESS);
                         }
                         //退出本章下载
                         if (!isrunning) {
@@ -176,6 +209,21 @@ public class DownloadService extends Service {
             } catch (InterruptedIOException e) {
                 e.printStackTrace();
             }
+            isOk();
+        }
+
+        private void isOk() {
+            if (success + failed == size) {
+                //保存进度
+                DownDbApi.setDownedSectionIndex(task.getSectionurl(), success, failed, size);
+                if (failed > 0) {
+                    RxStatus(DownloadStatus.STATE_START);
+                } else {
+                    RxStatus(DownloadStatus.STATE_DOWNLOADED);
+                    setQueue();
+                }
+                completeDownload(task.getIndex());
+            }
         }
 
         //尝试下载图片并保存
@@ -185,14 +233,14 @@ public class DownloadService extends Service {
                 response = mHttpClient.newCall(request).execute();
                 if (response.isSuccessful()) {
                     FileUtil.saveText2Sdcard(getSectionImgPath(path, bean), response.body().byteStream());
-                    Log.d(TAG,"下载成功index："+ bean.getIndex() + " url:" + bean.getUrl());
+                    Log.d(TAG, "下载成功index：" + bean.getIndex() + " url:" + bean.getUrl());
 
                     success++;
-                    setIndex();
+                    RxStatus(DownloadStatus.STATE_PROCRESS);
                     return true;
                 }
             } catch (InterruptedIOException e) {
-                RxStatus(DownloadStatus.STATE_PAUSED, success, failed);
+                RxStatus(DownloadStatus.STATE_PAUSED);
                 // 由暂停下载引发，需要抛出以便退出外层循环，结束任务
                 throw e;
             } catch (IOException e) {
@@ -214,42 +262,30 @@ public class DownloadService extends Service {
                     .build();
         }
 
-        //章节：更新状态
-        private void setIndex() {
-            RxStatus(DownloadStatus.STATE_PROCRESS, success, failed);
-            if (success + failed == task.getTotal()) {
-                //保存进度
-                DownDbApi.setDownedSectionIndex(task.getSectionurl(), success, failed);
-                if (failed > 0) {
-                    RxStatus(DownloadStatus.STATE_START);
-                }else {
-                    RxStatus(DownloadStatus.STATE_DOWNLOADED);
-                    setQueue();
-                }
-                completeDownload(task.getIndex());
-            }
-        }
-
         //漫画：更新状态(多线程时会少加)
         private void setQueue() {
             int progress = DownDbApi.getDownedQueueProgress(task.getBkey());
             DownDbApi.setDownedQueueProgress(task.getBkey(), progress + 1);
+            Log.d(TAG, "下载完成：" + task.getSection() +"\n--------");
         }
 
         //发送状态&&保存状态
-        private void RxStatus(int status) {RxStatus(status, 0, 0);}
-
-        private void RxStatus(int status, int size) {
-            DownDbApi.setDownedSectionTotal(task.getSectionurl(), size);  //保存总页数
-            RxStatus(status, size, 0);
-        }
-
-        private void RxStatus(int status, int success, int failed) {
+        private void RxStatus(int status) {
             DownDbApi.setDownedSectionState(task.getSectionurl(), status); //修改状态
-            RxBus.getDefault().post(new RxEvent(RxEvent.EVENT_DOWN2_STATUS, task.getSectionurl(), status, success, failed));
+            RxBus.getDefault().post(new RxEvent(RxEvent.EVENT_DOWN2_STATUS, task.getSectionurl(), status, success, failed, size));
         }
     }
 
     //=========================================
+    public static Intent createIntent(Context context, DownSectionBean bean) {
+        ArrayList<DownSectionBean> list = new ArrayList<>(1);
+        list.add(bean);
+        return createIntent(context, list);
+    }
 
+    private static Intent createIntent(Context context, ArrayList<DownSectionBean> list) {
+        Intent intent = new Intent(context, DownloadService.class);
+        intent.putParcelableArrayListExtra(Extra.EXTRA_TASK, list);
+        return intent;
+    }
 }

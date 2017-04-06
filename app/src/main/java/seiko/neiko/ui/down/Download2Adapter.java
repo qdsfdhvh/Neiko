@@ -2,7 +2,6 @@ package seiko.neiko.ui.down;
 
 import android.view.ViewGroup;
 
-//import rx.subscriptions.CompositeSubscription;
 import io.reactivex.disposables.CompositeDisposable;
 import seiko.neiko.models.DownSectionBean;
 import seiko.neiko.service.DownloadManger;
@@ -16,7 +15,6 @@ class Download2Adapter extends AbstractAdapter<DownSectionBean, Download2ViewHol
 
     private String last_surl;
     private DownloadManger manager;
-//    private CompositeSubscription mSubscriptions;
     private CompositeDisposable compositeDisposable;
 
     Download2Adapter(DownloadManger manager) {this.manager = manager;}
@@ -35,12 +33,6 @@ class Download2Adapter extends AbstractAdapter<DownSectionBean, Download2ViewHol
 
     //=======================================
     /** 取消ViewHolder中Rx订阅 */
-//    CompositeSubscription getmSubscriptions() {
-//        if (mSubscriptions == null)
-//            mSubscriptions = new CompositeSubscription();
-//        return mSubscriptions;
-//    }
-
     CompositeDisposable getmSubscriptions() {
         if (compositeDisposable == null)
             compositeDisposable = new CompositeDisposable();
@@ -48,10 +40,6 @@ class Download2Adapter extends AbstractAdapter<DownSectionBean, Download2ViewHol
     }
 
     void unsubscribe() {
-//        if (mSubscriptions != null && !mSubscriptions.isUnsubscribed()) {
-//            mSubscriptions.unsubscribe();
-//            mSubscriptions.clear();
-//        }
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
             compositeDisposable.clear();

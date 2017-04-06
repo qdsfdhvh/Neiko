@@ -5,6 +5,7 @@ import android.content.Context;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.GlideModule;
@@ -27,17 +28,20 @@ public class CustomModule implements GlideModule {
         ViewTarget.setTagId(R.id.glide_tag_id);
 
         builder.setDecodeFormat(DecodeFormat.PREFER_RGB_565);
-        builder.setDiskCache(() -> {
-            // Careful: the external cache directory doesn't enforce permissions
-            File cacheLocation = new File(cachePath, "/img");
+        builder.setDiskCache(new DiskCache.Factory() {
+            @Override
+            public DiskCache build() {
+                // Careful: the external cache directory doesn't enforce permissions
+                File cacheLocation = new File(cachePath, "/img");
 
-            boolean isCreate = cacheLocation.exists();
-            while (!isCreate) {
-                isCreate = cacheLocation.mkdirs();
+                boolean isCreate = cacheLocation.exists();
+                while (!isCreate) {
+                    isCreate = cacheLocation.mkdirs();
+                }
+
+                //104857600 == 100M
+                return DiskLruCacheWrapper.get(cacheLocation, 100 * 1024 * 1024);
             }
-
-            //104857600 == 100M
-            return DiskLruCacheWrapper.get(cacheLocation, 100 * 1024 * 1024);
         });
     }
 

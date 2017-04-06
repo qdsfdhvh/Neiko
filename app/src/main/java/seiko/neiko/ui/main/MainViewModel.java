@@ -1,4 +1,4 @@
-package seiko.neiko.viewModels;
+package seiko.neiko.ui.main;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +16,7 @@ import java.util.List;
 
 import seiko.neiko.models.Book;
 import seiko.neiko.dao.engine.DdSource;
+import seiko.neiko.viewModels.ViewModelBase;
 
 /**
  * Created by Seiko on 2016/8/30.
@@ -105,3 +106,4 @@ public class MainViewModel extends ViewModelBase implements ISdViewModel {
     }
 
 }
+

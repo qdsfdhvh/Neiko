@@ -48,24 +48,30 @@ public class ZoomableRecyclerView extends RecyclerView {
 
     public ZoomableRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setLayoutManager(new SupportLinearLayoutManager(context, VERTICAL, false));
+//        setLayoutManager(new SupportLinearLayoutManager(context, VERTICAL, false));
         initDetector();
         mContext = context;
     }
 
-    /** 控制缩放后上下滑动的速度 */
-    private class SupportLinearLayoutManager extends LinearLayoutManager {
-
-        SupportLinearLayoutManager(Context context,int orientation, boolean reverseLayout) {
-            super(context, orientation, reverseLayout);
-        }
-
-        @Override
-        public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            float result = dy / (mScale * mScale);
-            return super.scrollVerticallyBy((int) (result), recycler, state);
-        }
+    @Override
+    public boolean fling(int velocityX, int velocityY) {
+        velocityX *= mScale;
+        return super.fling(velocityX, velocityY);
     }
+
+    /** 控制缩放后上下滑动的速度 */
+//    private class SupportLinearLayoutManager extends LinearLayoutManager {
+//
+//        SupportLinearLayoutManager(Context context,int orientation, boolean reverseLayout) {
+//            super(context, orientation, reverseLayout);
+//        }
+//
+//        @Override
+//        public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+//            float result = dy / (mScale * mScale);
+//            return super.scrollVerticallyBy((int) (result), recycler, state);
+//        }
+//    }
 
     /** 双击放大 */
     private void initDetector() {

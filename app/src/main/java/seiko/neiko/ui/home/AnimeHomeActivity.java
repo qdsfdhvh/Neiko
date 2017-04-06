@@ -10,12 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
-
+import org.noear.sited.SdSourceCallback;
 import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import seiko.neiko.dao.engine.DdApi;
@@ -24,15 +22,15 @@ import seiko.neiko.R;
 import seiko.neiko.dao.SourceApi;
 import seiko.neiko.ui.search.SearchActivity;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.viewModels.MainViewModel;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.ui.main.MainViewModel;
+import seiko.neiko.app.BaseSwipeLayout;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
 import static seiko.neiko.dao.mPath.getHomeCachePath;
 import static seiko.neiko.dao.mNum.HOTS_NUMBER;
 import static seiko.neiko.dao.mNum.TAGS_NUMBER;
 
-public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearchView.OnSearchListener {
+public class AnimeHomeActivity extends BaseSwipeLayout implements FloatingSearchView.OnSearchListener {
 
     public static HomeModel m;
 
@@ -41,9 +39,9 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
     FloatingSearchView mSearchBar;
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
+    @BindView(R.id.refresh)
+    SwipeRefreshLayout refresh;
 
-    private SwipeRefreshLayout ref1;
-    private SwipeRefreshLayout ref2;
     private HomeHotAdapter adapter_hot;
     private HomeTagAdapter adapter_tag;
     private MainViewModel model = new MainViewModel();
@@ -53,18 +51,14 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
     public int getLayoutId() {return R.layout.activity_home;}
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         source = SourceApi.getDefault().getByUrl(m.url);
         path = getHomeCachePath(m.url);
-
+        addRefresh();
         getPath();  //加载参数
-
         mViewPager.setAdapter(new PagerAdapterMain2());
-
         SearchHint();
     }
-
 
     //=================================================
     /** 尝试从本地获得参数 */
@@ -79,13 +73,16 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
     /** 从网络中获得内容 */
     private void getNodeViewModel() {
         model.clear();
-        source.getNodeViewModel(model, source.home, true, (code) -> {
-            if (code==1) {
-                HomeSaveEvent event = new HomeSaveEvent(model.hotList, model.tagList);
-                FileUtil.save(path, event);
-                addList(event);
-            } else {
-                adapter_hot.loadMoreFailed();
+        source.getNodeViewModel(model, source.home, true, new SdSourceCallback() {
+            @Override
+            public void run(Integer code) {
+                if (code==1) {
+                    HomeSaveEvent event = new HomeSaveEvent(model.hotList, model.tagList);
+                    FileUtil.save(path, event);
+                    addList(event);
+                } else {
+                    adapter_hot.loadMoreFailed();
+                }
             }
         });
     }
@@ -105,8 +102,7 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
             adapter_tag.addAll(ev.getTagList());
         }
 
-        if (ref1 != null) ref1.setRefreshing(false);
-        if (ref2 != null) ref2.setRefreshing(false);
+        refresh.setRefreshing(false);
     }
 
     //=================================================
@@ -116,8 +112,6 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
         View hot = inflate(R.layout.fragment_home_hot, mViewPager);
         views.add(hot);
         PracticalRecyclerView recView_hot = ButterKnife.findById(hot, R.id.recView_hot);
-        ref1 = (SwipeRefreshLayout) hot.findViewById(R.id.refresh);
-        addRefresh(ref1);
 
         adapter_hot = new HomeHotAdapter(source, m.url);
         recView_hot.setLayoutManager(new StaggeredGridLayoutManager(HOTS_NUMBER, OrientationHelper.VERTICAL));
@@ -130,8 +124,6 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
         View tag = inflate(R.layout.fragment_home_tag, mViewPager);
         views.add(tag);
         RecyclerView recView_tag = ButterKnife.findById(tag, R.id.recView_tag);
-        ref2 = (SwipeRefreshLayout) tag.findViewById(R.id.refresh);
-        addRefresh(ref2);
 
         adapter_tag = new HomeTagAdapter();
         recView_tag.setLayoutManager(new GridLayoutManager(this, TAGS_NUMBER));
@@ -140,16 +132,19 @@ public class AnimeHomeActivity extends SwipeLayoutBase implements FloatingSearch
     }
 
     //下拉刷新
-    private void addRefresh(SwipeRefreshLayout refresh) {
+    private void addRefresh() {
         refresh.setColorSchemeResources(
                 R.color.deep_purple_500, R.color.pink_500,
                 R.color.orange_500, R.color.brown_500,
                 R.color.indigo_500, R.color.blue_500,
                 R.color.teal_500);
-        refresh.setOnRefreshListener(() -> {
-            if (adapter_hot != null) adapter_hot.clear();
-            if (adapter_tag != null) adapter_tag.clear();
-            getNodeViewModel();
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (adapter_hot != null) adapter_hot.clear();
+                if (adapter_tag != null) adapter_tag.clear();
+                getNodeViewModel();
+            }
         });
     }
 

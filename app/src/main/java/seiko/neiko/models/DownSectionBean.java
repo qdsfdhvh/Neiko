@@ -1,15 +1,19 @@
 package seiko.neiko.models;
 
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import rx.subscriptions.CompositeSubscription;
 import zlc.season.practicalrecyclerview.ItemType;
 
 /**
  * Created by Seiko on 2016/11/22. YiKu
  */
 
-public class DownSectionBean implements ItemType {
+public class DownSectionBean implements ItemType, Parcelable {
 
     private int type;
     private String bkey;
@@ -31,15 +35,19 @@ public class DownSectionBean implements ItemType {
     private int index;
     private boolean isAdd;
 
-    private List<ImgUrlBean> list;
+    private ArrayList<ImgUrlBean> list;
+
+    public DownSectionBean() {
+
+    }
 
     //========================================
 
-    public void setList(List<ImgUrlBean> list) {
+    public void setList(ArrayList<ImgUrlBean> list) {
         this.list = list;
     }
 
-    public List<ImgUrlBean> getList() {
+    public ArrayList<ImgUrlBean> getList() {
         return list;
     }
 
@@ -167,6 +175,64 @@ public class DownSectionBean implements ItemType {
     public int itemType() {
         return 0;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(type);
+        dest.writeString(bkey);
+        dest.writeString(source);
+        dest.writeString(bookUrl);
+        dest.writeString(bookName);
+        dest.writeString(section);
+        dest.writeString(sectionurl);
+        dest.writeInt(success);
+        dest.writeInt(failed);
+        dest.writeInt(total);
+        dest.writeInt(status);
+        dest.writeString(path);
+        dest.writeInt(index);
+        dest.writeByte((byte) (isAdd ? 1 : 0));
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(DATA_KEY, list);
+        dest.writeBundle(bundle);
+    }
+
+    private String DATA_KEY = "a";
+
+    private DownSectionBean(Parcel in) {
+        type = in.readInt();
+        bkey = in.readString();
+        source = in.readString();
+        bookUrl = in.readString();
+        bookName = in.readString();
+        section = in.readString();
+        sectionurl = in.readString();
+        success = in.readInt();
+        failed = in.readInt();
+        total = in.readInt();
+        status = in.readInt();
+        path = in.readString();
+        index = in.readInt();
+        isAdd = in.readByte() != 0;
+        list = in.readBundle(getClass().getClassLoader()).getParcelableArrayList(DATA_KEY);
+    }
+
+    public static final Creator<DownSectionBean> CREATOR = new Creator<DownSectionBean>() {
+        @Override
+        public DownSectionBean createFromParcel(Parcel in) {
+            return new DownSectionBean(in);
+        }
+
+        @Override
+        public DownSectionBean[] newArray(int size) {
+            return new DownSectionBean[size];
+        }
+    };
 
     //==============================
 }

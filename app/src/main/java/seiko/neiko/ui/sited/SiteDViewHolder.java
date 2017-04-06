@@ -47,8 +47,18 @@ class SitedViewHolder extends AbstractViewHolder<SourceModel> {
     void delete() {
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除：" + m.title)
-                .setNegativeButton("是", (DialogInterface dif, int j) -> deleteSited())      //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())      //通知最右按钮
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteSited();
+                    }
+                })      //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
                 .create()
                 .show();
     }

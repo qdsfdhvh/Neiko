@@ -6,15 +6,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.view.RxView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import seiko.neiko.R;
 import seiko.neiko.dao.mIntent;
 import seiko.neiko.glide.ImageLoader;
-import seiko.neiko.models.Book;
 import seiko.neiko.ui.book.BookModel;
 import zlc.season.practicalrecyclerview.AbstractViewHolder;
 
@@ -31,14 +28,12 @@ class TagViewHolder extends AbstractViewHolder<BookModel> {
     TextView au;
 
     private Context mContext;
-    private TagAdapter adapter;
     private BookModel book;
 
-    TagViewHolder(ViewGroup parent, TagAdapter adapter) {
+    TagViewHolder(ViewGroup parent) {
         super(parent, R.layout.item_tag);
         ButterKnife.bind(this, itemView);
         this.mContext = parent.getContext();
-        this.adapter = adapter;
     }
 
     @Override

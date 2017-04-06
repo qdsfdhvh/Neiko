@@ -90,14 +90,6 @@ public class DbApi {
         }
     }
 
-    //donws
-    //
-//    public static void logBID(DdSource source, BookViewModel book) {
-//        if (source.title != null) {
-//            logBID(source.title,book.bookKey,book.bookUrl);
-//        }
-//    }
-
     public static void logBID(String source, String bookKey, String bookUrl) {
         if (!db.existsSQL("SELECT * FROM books WHERE bkey=?", bookKey)) {
             db.updateSQL("INSERT INTO books(bkey,url,source) VALUES(?,?,?);",
@@ -105,63 +97,33 @@ public class DbApi {
         }
     }
 
-//    public static int getBID(String bookKey) {
-//
-//        int bid = 0;
-//        DataReader dr = db.selectSQL("SELECT id FROM books WHERE bkey=?;", bookKey);
-//        if (dr.read()) {
-//            bid = dr.getInt("id");
-//        }
-//        dr.close();
-//        return bid;
-//    }
-
 
     //=====================================================
     /** books */
-    public static void setBookLastLook(String bkey, String last_surl, Integer page) {
+    public static void setBookLastLook(String url, String last_surl, Integer page) {
         if(page<0)
-            db.updateSQL("UPDATE books SET last_surl=?, last_pidx=-1 WHERE bkey=? )", last_surl, bkey);
+            db.updateSQL("UPDATE books SET last_surl=?, last_pidx=-1 WHERE url=? )", last_surl, url);
         else
-            db.updateSQL("UPDATE books SET last_surl=?, last_pidx=? WHERE bkey=?", last_surl, page, bkey);
+            db.updateSQL("UPDATE books SET last_surl=?, last_pidx=? WHERE url=?", last_surl, page, url);
     }
 
-    public static void setBookLastLook(String bkey, Integer page) {
+    public static void setBookLastLook(String url, Integer page) {
         if(page<0)
-            db.updateSQL("UPDATE books SET last_pidx=-1 WHERE bkey=? )", bkey);
+            db.updateSQL("UPDATE books SET last_pidx=-1 WHERE url=? )", url);
         else
-            db.updateSQL("UPDATE books SET last_pidx=? WHERE bkey=?", page, bkey);
+            db.updateSQL("UPDATE books SET last_pidx=? WHERE url=?", page, url);
     }
 
-//    public static void setBookSectionCount(Integer bookBID, Integer num) {
-//        db.updateSQL("UPDATE books SET section_count=? WHERE id=?", num, bookBID);
-//    }
 
-    public static int getBookLastLookSection(String bkey) {
+    public static int getBookLastLookSection(String url) {
         int temp = -1;
-        DataReader dr = db.selectSQL("SELECT last_pidx FROM books WHERE bkey=?", bkey);
+        DataReader dr = db.selectSQL("SELECT last_pidx FROM books WHERE url=?", url);
         if (dr.read()) {
             temp = dr.getInt("last_pidx");
         }
         dr.close();
         return temp;
     }
-
-//    public static String getLastBookKey(String sectionUrl) {
-//
-//        String temp = null;
-//        DataReader dr = db.selectSQL("SELECT bkey FROM books WHERE url=?" ,sectionUrl);
-//        if (dr.read()) {
-//            temp = dr.getString("bkey");
-//        }
-//        dr.close();
-//
-//        return temp;
-//    }
-
-//    public static void setLastBookPage(String bkey, String sectionUrl, Integer page, Integer book) {
-//        db.updateSQL("UPDATE books SET last_page=?, last_pidx=?, last_surl=? WHERE bkey=?", page, book, sectionUrl, bkey);
-//    }
 
     public static void setLastBookPage2(String bookurl, String sectionUrl, Integer page, Integer book) {
         db.updateSQL("UPDATE books SET last_page=?, last_pidx=?, last_surl=? WHERE url=?", page, book, sectionUrl, bookurl);
@@ -180,9 +142,9 @@ public class DbApi {
     }
 
 
-    public static String getLastBookUrl(String bkey) {
+    public static String getLastBookUrl(String url) {
         String temp = null;
-        DataReader dr = db.selectSQL("SELECT last_surl FROM books WHERE bkey=?" , bkey);
+        DataReader dr = db.selectSQL("SELECT last_surl FROM books WHERE url=?" , url);
         if (dr.read()) {
             temp = dr.getString("last_surl");
         }
@@ -192,14 +154,14 @@ public class DbApi {
     }
 
 
-    public static void setBookViewSet(String bkey, ViewSetModel set) {
-        db.updateSQL("UPDATE books SET view_orientation=?,view_model=?,view_scale=?,view_direction=? WHERE bkey=?",
-                set.view_orientation, set.view_model, set.view_scale,set.view_direction, bkey);
+    public static void setBookViewSet(String url, ViewSetModel set) {
+        db.updateSQL("UPDATE books SET view_orientation=?,view_model=?,view_scale=?,view_direction=? WHERE url=?",
+                set.view_orientation, set.view_model, set.view_scale,set.view_direction, url);
     }
 
-    public static ViewSetModel getBookViewSet(String bkey) {
+    public static ViewSetModel getBookViewSet(String url) {
         ViewSetModel temp = new ViewSetModel();
-        DataReader dr = db.selectSQL("SELECT view_orientation, view_model,view_scale,view_direction FROM books WHERE bkey=?", bkey);
+        DataReader dr = db.selectSQL("SELECT view_orientation, view_model,view_scale,view_direction FROM books WHERE url=?", url);
         if (dr.read()) {
             temp.view_orientation = dr.getInt("view_orientation");
             temp.view_model       = dr.getInt("view_model");
@@ -246,19 +208,19 @@ public class DbApi {
                     book.getType(), book.getUrl(), book.getName(), book.getLogo(), book.getAuthor(), book.getSource(), book.getNumber(), book.getBkey());
         }
 
-        if (book.isref()) {
-            if(!db.existsSQL("SELECT * FROM books WHERE url=?", book.getUrl())) {
-//                Log.d("addBook","添加："+book.getBkey());
-                db.updateSQL("INSERT INTO books(bkey, url, section_count, last_surl, last_pidx, last_page, source) VALUES(?,?,?,?,?,?,?);",
-                        book.getBkey(), book.getUrl(), book.getSection_count(),
-                        book.getLast_surl(), book.getLast_pidx(), book.getLast_page(), book.getSource());
-            } else {
-//                Log.d("addBook","更新："+book.getBkey());
-                db.updateSQL("UPDATE books SET url=?, section_count=?, last_surl=?, last_pidx=?, last_page=?, source=? WHERE bkey=?;",
-                        book.getUrl(), book.getSection_count(), book.getLast_surl(),
-                        book.getLast_pidx(), book.getLast_page(), book.getSource(), book.getBkey());
-            }
-        }
+//        if (book.isref()) {
+//            if(!db.existsSQL("SELECT * FROM books WHERE url=?", book.getUrl())) {
+////                Log.d("addBook","添加："+book.getBkey());
+//                db.updateSQL("INSERT INTO books(bkey, url, section_count, last_surl, last_pidx, last_page, source) VALUES(?,?,?,?,?,?,?);",
+//                        book.getBkey(), book.getUrl(), book.getSection_count(),
+//                        book.getLast_surl(), book.getLast_pidx(), book.getLast_page(), book.getSource());
+//            } else {
+////                Log.d("addBook","更新："+book.getBkey());
+//                db.updateSQL("UPDATE books SET url=?, section_count=?, last_surl=?, last_pidx=?, last_page=?, source=? WHERE bkey=?;",
+//                        book.getUrl(), book.getSection_count(), book.getLast_surl(),
+//                        book.getLast_pidx(), book.getLast_page(), book.getSource(), book.getBkey());
+//            }
+//        }
     }
 
     public static void setNumber(String url, int number) {
@@ -382,7 +344,7 @@ public class DbApi {
         db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "TextSize");
     }
 
-
+    //===
     public static int getCutPic() {
         if (!db.existsSQL("SELECT setData FROM setting WHERE setName=?", "CutPic")) {
             db.updateSQL("INSERT INTO setting(setName, setData) VALUES(?,?)", "CutPic", 0);
@@ -403,6 +365,7 @@ public class DbApi {
         db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "CutPic");
     }
 
+    //===
     public static int getTextTheme() {
         if (!db.existsSQL("SELECT setData FROM setting WHERE setName=?", "TextTheme")) {
             db.updateSQL("INSERT INTO setting(setName, setData) VALUES(?,?)", "TextTheme", 0);
@@ -421,5 +384,26 @@ public class DbApi {
 
     public static void setTextTheme(int i) {
         db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "TextTheme");
+    }
+
+    //===
+    public static int getVideoMode() {
+        if (!db.existsSQL("SELECT setData FROM setting WHERE setName=?", "VideoMode")) {
+            db.updateSQL("INSERT INTO setting(setName, setData) VALUES(?,?)", "VideoMode", 0);
+            return 0;
+        }
+
+        int CutPic = 0;
+        DataReader dr = db.selectSQL("SELECT setData FROM setting WHERE setName=?", "VideoMode");
+        if (dr.read()) {
+            CutPic = dr.getInt("setData");
+        }
+        dr.close();
+
+        return CutPic;
+    }
+
+    public static void setVideoMode(int i) {
+        db.updateSQL("UPDATE setting SET setData=? WHERE setName=?", i, "VideoMode");
     }
 }

@@ -28,7 +28,6 @@ import seiko.neiko.dao.Permission;
 import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
-import seiko.neiko.view.BaseView;
 
 /**
  * Created by Seiko on 2016/10/1.
@@ -36,7 +35,7 @@ import seiko.neiko.view.BaseView;
  * 当前类注释:基类Actvity 主要封装一些工具类的使用,公共方法,配置
  */
 
-public abstract class ActivityBase extends FragmentActivity implements BaseView {
+public abstract class BaseActivity extends FragmentActivity implements BaseView {
 
     protected static DdSource source;
     private CompositeDisposable compositeDisposable;
@@ -54,6 +53,7 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
         compositeDisposable = new CompositeDisposable();
         setContentView(getLayoutId());
         ButterKnife.bind(this);
+        initViews(savedInstanceState);
     }
 
     @Override
@@ -87,24 +87,18 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
 
     //====================================================================
     /** 全屏 */
-    public void setImmersiveFullscreen(boolean isFullscreen) {
+    public void setImmersiveFullscreen() {
         Window window = getWindow();
 
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        int uiOpts;
-
-        if (isFullscreen) {
-            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        } else {
-            uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-        }
+        int uiOpts = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
         window.getDecorView().setSystemUiVisibility(uiOpts);
     }
@@ -187,9 +181,13 @@ public abstract class ActivityBase extends FragmentActivity implements BaseView 
     protected void toast(String msg) {
         final Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         toast.show();
-        new Handler().postDelayed(() -> toast.cancel(), 1000);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 1000);
     }
-
 
     //====================================================================
     /** RxJava相关 */

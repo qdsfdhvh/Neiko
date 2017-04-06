@@ -5,14 +5,12 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:orientation="vertical">
-
-    <!--图片列表-->
     <seiko.neiko.widget.photo.PhotoView
         android:id="@+id/section_views"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitStart"
-        android:adjustViewBounds="true" />
-
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true" /><!--图片列表-->
 </LinearLayout>
+
 

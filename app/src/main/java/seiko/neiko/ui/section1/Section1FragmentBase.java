@@ -11,8 +11,9 @@ import seiko.neiko.dao.engine.DdSource;
 import seiko.neiko.models.Book;
 import seiko.neiko.models.DownSectionBean;
 import seiko.neiko.models.ImgUrlBean;
-import seiko.neiko.app.FragmentBase;
+import seiko.neiko.app.BaseFragment;
 import seiko.neiko.utils.FileUtil;
+import seiko.neiko.view.Section1View;
 
 import static seiko.neiko.dao.mPath.getSectionDownPath;
 import static seiko.neiko.dao.mPath.getSectionImgPath;
@@ -21,7 +22,7 @@ import static seiko.neiko.dao.mPath.getSectionImgPath;
  * Created by Seiko on 2016/12/26. Y
  */
 
-public abstract class Section1FragmentBase extends FragmentBase {
+public abstract class Section1FragmentBase extends BaseFragment {
 
     public static int dtype;
     public static List<Book> imgList;
@@ -58,21 +59,18 @@ public abstract class Section1FragmentBase extends FragmentBase {
     //==============================================
     /** 读取本地图片链接 */
     @Nullable
-    protected List<Book> readPath(String name) {
+    protected List<ImgUrlBean> readPath(String name) {
         String path1 = getSectionDownPath(source.title, bookName, name);
         DownSectionBean bean = FileUtil.get(path1 + "/SectionBean", DownSectionBean.class);
         if (bean != null) {
             List<ImgUrlBean> list = bean.getList();
 
-            List<Book> sectionList = new ArrayList<>();
             for (ImgUrlBean bean1:list) {
-                Book book = new Book();
-                book.setSection_url(bean1.getUrl());
-                book.setPath(getSectionImgPath(path1, bean1));
-                sectionList.add(book);
+                bean1.setPath(getSectionImgPath(path1, bean1));
             }
+
             Log.d("AnimeSection1Activity", "读取本地数据");
-            return sectionList;
+            return list;
         }
         return null;
     }

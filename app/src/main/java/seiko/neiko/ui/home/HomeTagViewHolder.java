@@ -37,5 +37,7 @@ class HomeTagViewHolder extends AbstractViewHolder<Book> {
 
     @OnClick(R.id.layout)
     void OnClick() {
-        mIntent.Intent_Home_Tag(mContext, book);}
+        mIntent.Intent_Home_Tag(mContext, book);
+    }
+
 }

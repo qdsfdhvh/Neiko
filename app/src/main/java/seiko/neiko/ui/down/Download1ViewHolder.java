@@ -64,7 +64,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
     public void setData(DownBookBean param) {
         this.data = param;
 
-        //进度很状态需要重新读取
+        //进度很状态重新读取
         int progress = DownDbApi.getDownedQueueProgress(data.getBkey());
         data.setProgress(progress);
         int state = DownDbApi.getDownedQueueState(data.getBkey());
@@ -81,7 +81,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
         mProgress.setMax(data.getTotal());
         mProgress.setProgress(data.getProgress());
         //例：5/10
-        mSize.setText(data.getProgress() + "/" + data.getTotal());
+        mSize.setText(String.valueOf(data.getProgress() + "/" + data.getTotal()));
 
         mStatus.setText("暂时关闭");
         mStatus.setClickable(false);
@@ -118,11 +118,24 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
     boolean onLongClick() {
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除漫画："+ data.getTitle())
-                .setNegativeButton("是", (DialogInterface dif, int j) -> delDown(data.getBkey()))   //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss() )      //通知最右按钮
-                .setNeutralButton("初始化", (DialogInterface dif, int j) -> {
-                    DownDbApi.setDownedQueueState(data.getBkey(), DownBookBean.START);
-                    setDown(data);
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        delDown(data.getBkey());
+                    }
+                })   //通知中间按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
+                .setNeutralButton("初始化", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DownDbApi.setDownedQueueState(data.getBkey(), DownBookBean.START);
+                        setDown(data);
+                    }
                 })  //通知最左按钮
                 .create()
                 .show();
@@ -135,7 +148,7 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
         data.setState(DownBookBean.START);
         mStatus.setText("开始");
         mProgress.setProgress(0);
-        mSize.setText(data.getProgress() + "/" + data.getTotal());
+        mSize.setText(String.valueOf(data.getProgress() + "/" + data.getTotal()));
     }
 
     //删除下载
@@ -146,10 +159,18 @@ class Download1ViewHolder extends AbstractViewHolder<DownBookBean> {
 
         new AlertDialog.Builder(mContext)
                 .setMessage("是否删除本地文件")
-                .setNegativeButton("是", (DialogInterface dif, int j) -> {
-                    FileUtil.deleteFile(path);
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileUtil.deleteFile(path);
+                    }
                 })   //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())      //通知最右按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })      //通知最右按钮
                 .create()
                 .show();
     }

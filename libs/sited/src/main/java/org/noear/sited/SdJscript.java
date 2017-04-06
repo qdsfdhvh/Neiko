@@ -49,7 +49,7 @@ class SdJscript {
 //        }
     }
 
-    void loadJs(Application app, JsEngine js) {
+    void loadJs(final Application app, final JsEngine js) {
         if (!require.isEmpty()) {
             for (SdNode n1 : require.items()) {
 
@@ -67,9 +67,12 @@ class SdJscript {
                 }
 
                 HttpMessage msg = new HttpMessage(n1,n1.url);
-                msg.callback = (code, sender, text, url302) -> {
-                    if (code == 1) {
-                        js.loadJs(text);
+                msg.callback = new HttpCallback() {
+                    @Override
+                    public void run(Integer code, HttpMessage sender, String text, String url302) {
+                        if (code == 1) {
+                            js.loadJs(text);
+                        }
                     }
                 };
 

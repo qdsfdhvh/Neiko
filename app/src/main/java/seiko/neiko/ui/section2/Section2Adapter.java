@@ -3,6 +3,7 @@ package seiko.neiko.ui.section2;
 import android.view.ViewGroup;
 
 import seiko.neiko.models.TxtModel;
+import seiko.neiko.view.Section2View;
 import zlc.season.practicalrecyclerview.AbstractAdapter;
 
 /**

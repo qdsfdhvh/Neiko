@@ -12,9 +12,11 @@ import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import seiko.neiko.app.BasePresenter;
 import seiko.neiko.models.SourceModel;
+import seiko.neiko.view.SitedItemView;
 
 import static seiko.neiko.dao.mPath.sitedPath;
 
@@ -22,16 +24,27 @@ import static seiko.neiko.dao.mPath.sitedPath;
  * Created by Seiko on 2017/2/25. Y
  */
 
-class SitedPresenter extends BasePresenter<SitedView> {
+class SitedPresenter extends BasePresenter<SitedItemView> {
 
     SitedPresenter() {compositeDisposable = new CompositeDisposable();}
 
     void loadData() {
         Disposable disposable = createObservable()
                 .subscribeOn(Schedulers.io())
-                .delay(2, TimeUnit.SECONDS)
+                .delay(800, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((List<SourceModel> list) -> mBaseView.onLoadSuccess(list), throwable -> mBaseView.onLoadFailed());
+                .subscribe(new Consumer<List<SourceModel>>() {
+                    @Override
+                    public void accept(List<SourceModel> list) throws Exception {
+                        mBaseView.onLoadSuccess(list);
+                    }
+
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        mBaseView.onLoadFailed();
+                    }
+                });
         addDisposable(disposable);
     }
 

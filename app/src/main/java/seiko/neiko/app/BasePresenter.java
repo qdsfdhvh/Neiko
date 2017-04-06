@@ -1,10 +1,9 @@
 package seiko.neiko.app;
 
+import com.google.gson.JsonObject;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import seiko.neiko.rx.RxBus;
-import seiko.neiko.rx.RxEvent;
 
 /**
  * Created by Seiko on 2017/2/25. Y
@@ -15,12 +14,12 @@ public class BasePresenter<T> {
     protected T mBaseView;
     protected CompositeDisposable compositeDisposable;
 
-    public void attachView(T baseView) {
+    public void setItemCallBack(T baseView) {
         mBaseView = baseView;
         compositeDisposable = new CompositeDisposable();
     }
 
-//    protected void addDisposable(int type, Consumer<RxEvent> action) {
+//    protected void addDisposable(int type, final Consumer<RxEvent> action) {
 //        compositeDisposable.add(RxBus.getDefault().toObservable(type).subscribe(action));
 //    }
 
@@ -31,5 +30,14 @@ public class BasePresenter<T> {
             compositeDisposable.dispose();
         }
         mBaseView = null;
+    }
+
+    //=========================================
+    protected String getString(JsonObject data, String key) {
+        return data.get(key) != null ? data.get(key).getAsString():"";
+    }
+
+    protected int getInt(JsonObject data, String key) {
+        return data.get(key) != null ? data.get(key).getAsInt():0;
     }
 }

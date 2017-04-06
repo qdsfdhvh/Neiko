@@ -70,6 +70,8 @@
 #不混淆所有的org.noear包下的类和这些类的所有成员变量
 -keep class org.noear.** {*;}
 -dontwarn org.noear.**
+-keep class okhttp.** {*;}
+-dontwarn okhttp.**
 #
 -keep class retrofit2.** {*;}
 -dontwarn retrofit2.**
@@ -120,11 +122,6 @@ public static final android.os.Parcelable$Creator *;
 }
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 
-# OkHttp3
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
--dontwarn okhttp3.**
-
 #eventBus
 -keepattributes *Annotation*
 -keepclassmembers class ** {
@@ -134,21 +131,6 @@ public static final android.os.Parcelable$Creator *;
 -keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
     <init>(java.lang.Throwable);
 }
-
-#httpclient (org.apache.http.legacy.jar)
--dontwarn android.net.compatibility.**
--dontwarn android.net.http.**
--dontwarn com.android.internal.http.multipart.**
--dontwarn org.apache.commons.**
--dontwarn org.apache.http.**
--dontwarn org.apache.http.protocol.**
--keep class android.net.compatibility.**{*;}
-
-#-keep class android.net.http.**{*;}
--keep class com.android.internal.http.multipart.**{*;}
--keep class org.apache.commons.**{*;}
--keep class org.apache.org.**{*;}
--keep class org.apache.harmony.**{*;}
 
 
 #butterknife

@@ -237,8 +237,8 @@ public class DownDbApi {
     }
 
     //更新进度
-    public static void setDownedSectionIndex(String url, int success, int failed) {
-        db.updateSQL("UPDATE down_section SET success=?, failed=? WHERE url=?", success, failed, url);
+    public static void setDownedSectionIndex(String url, int success, int failed, int total) {
+        db.updateSQL("UPDATE down_section SET success=?, failed=?, total=? WHERE url=?", success, failed, total, url);
     }
 
     //更新总页数

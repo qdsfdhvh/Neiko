@@ -75,9 +75,9 @@ class BookViewHolder extends AbstractViewHolder<Book> {
         if (!TextUtils.isEmpty(url)) {
             final int dtype = adapter.source.section(url).dtype();
             if (dtype == 3) {
-                DbApi.setBookLastLook(adapter.bean.getBkey(), url, i); //视频在此保存记录
+                DbApi.setBookLastLook(adapter.bean.getBookUrl(), url, i); //视频在此保存记录
             } else {
-                DbApi.setBookLastLook(adapter.bean.getBkey(), i);
+                DbApi.setBookLastLook(adapter.bean.getBookUrl(), i);
             }
             adapter.setLast_surl(url);
             mIntent.Intent_Book(mContext, book, dtype, i, adapter.bean);

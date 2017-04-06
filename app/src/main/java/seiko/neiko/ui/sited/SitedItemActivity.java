@@ -8,15 +8,16 @@ import java.util.List;
 
 import butterknife.BindView;
 import seiko.neiko.R;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.app.BaseSwipeLayout;
 import seiko.neiko.models.SourceModel;
+import seiko.neiko.view.SitedItemView;
 import zlc.season.practicalrecyclerview.PracticalRecyclerView;
 
 /**
  * Created by Seiko on 2017/2/13. Y
  */
 
-public class SitedActivity extends SwipeLayoutBase implements SitedView {
+public class SitedItemActivity extends BaseSwipeLayout implements SitedItemView {
 
     @BindView(R.id.title)
     TextView mTitle;
@@ -30,18 +31,21 @@ public class SitedActivity extends SwipeLayoutBase implements SitedView {
     public int getLayoutId() {return R.layout.activity_sited;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         mTitle.setText("本地插件");
 
         mAdapter = new SitedAdapter();
         mPresenter = new SitedPresenter();
-        mPresenter.attachView(this);
+        mPresenter.setItemCallBack(this);
 
         recView.setLayoutManager(new LinearLayoutManager(this));
         recView.setAdapterWithLoading(mAdapter);
-        recView.setRefreshListener(() -> mPresenter.loadData());
-
+        recView.setRefreshListener(new PracticalRecyclerView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPresenter.loadData();
+            }
+        });
         mPresenter.loadData();
     }
 

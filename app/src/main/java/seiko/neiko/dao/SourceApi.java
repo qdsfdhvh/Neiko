@@ -39,7 +39,7 @@ public class SourceApi {
 
     //===============================================
     /** 尝试读取sited */
-    public boolean readSited(Context from, String name) {
+    public boolean readSited(final Context from, final String name) {
         for (DdSource sd : _sourceList) {
             if (sd.title.contains(name))
                 return true;
@@ -49,8 +49,18 @@ public class SourceApi {
         if (TextUtils.isEmpty(sited)) {
             new AlertDialog.Builder(from)
                     .setMessage("需要安装插件:" + name)
-                    .setNegativeButton("访问", (DialogInterface dif, int j) -> mIntent.Intent_Web(from, "http://sited.noear.org/?key=" + name))
-                    .setPositiveButton("关闭", (DialogInterface dif, int j) -> dif.dismiss())
+                    .setNegativeButton("访问", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mIntent.Intent_Web(from, "http://sited.noear.org/?key=" + name);
+                        }
+                    })
+                    .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
                     .create()
                     .show();
             return false;

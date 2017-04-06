@@ -7,16 +7,16 @@ import android.support.v7.app.AlertDialog;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import java.io.File;
 import java.text.DecimalFormat;
 
 import butterknife.BindView;
-import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.utils.FileUtil;
-import seiko.neiko.app.SwipeLayoutBase;
+import seiko.neiko.app.BaseSwipeLayout;
 
 import static seiko.neiko.dao.mPath.cachePath;
 
@@ -24,7 +24,7 @@ import static seiko.neiko.dao.mPath.cachePath;
  * Created by Seiko on 2017/1/12. Y
  */
 
-public class CacheActivity extends SwipeLayoutBase {
+public class CacheActivity extends BaseSwipeLayout {
 
     @BindView(R.id.title)
     TextView tv;
@@ -33,8 +33,7 @@ public class CacheActivity extends SwipeLayoutBase {
     public int getLayoutId() {return R.layout.activity_cache;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         tv.setText("缓存");
 
         rxView(R.id.book_cache);
@@ -43,8 +42,8 @@ public class CacheActivity extends SwipeLayoutBase {
     }
 
     private void rxView(int id) {
-        String name;
-        String filename;
+        final String name;
+        final String filename;
         int text_id;
         int size_id;
         switch (id) {
@@ -69,26 +68,39 @@ public class CacheActivity extends SwipeLayoutBase {
             default:
                 return;
         }
-        LinearLayout tv = (LinearLayout) findViewById(id);
-        TextView text = (TextView)  findViewById(text_id);
-        TextView size = (TextView)  findViewById(size_id);
+        final LinearLayout tv = (LinearLayout) findViewById(id);
+        final TextView text = (TextView) findViewById(text_id);
+        final TextView size = (TextView) findViewById(size_id);
         text.setText(String.valueOf("路径：" + filename));
         loadTextSize(size, filename);
-        RxView.clicks(tv).subscribe((Void a) -> getDialog(size, name, filename));
+        RxView.clicks(tv).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                getDialog(size, name, filename);
+            }
+        });
     }
 
     private void loadTextSize(TextView tv, String filename) {
         tv.setText(String.valueOf("大小：" + filesize(filename)));
     }
 
-    private void getDialog(TextView tv, String name,  String filename) {
+    private void getDialog(final TextView tv, String name, final String filename) {
         new AlertDialog.Builder(this)
                 .setMessage("是否清空：" + name + " 缓存")
-                .setNegativeButton("是", (DialogInterface dif, int j) -> {
-                    FileUtil.deleteFile(filename);
-                    loadTextSize(tv, filename);
+                .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileUtil.deleteFile(filename);
+                        loadTextSize(tv, filename);
+                    }
                 })      //通知中间按钮
-                .setPositiveButton("否", (DialogInterface dif, int j) -> dif.dismiss())        //通知最右按钮
+                .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })        //通知最右按钮
                 .create()
                 .show();
     }

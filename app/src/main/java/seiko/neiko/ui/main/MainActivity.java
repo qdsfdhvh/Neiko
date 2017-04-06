@@ -35,19 +35,19 @@ import seiko.neiko.models.SourceModel;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
 import seiko.neiko.ui.CacheActivity;
-import seiko.neiko.app.ActivityBase;
-import seiko.neiko.ui.sited.SitedActivity;
+import seiko.neiko.app.BaseActivity;
+import seiko.neiko.ui.sited.SitedItemActivity;
 import seiko.neiko.ui.search.SearchActivity;
 import seiko.neiko.ui.AboutActivity;
 import seiko.neiko.ui.down.Download1Activity;
-import seiko.neiko.utils.Base64Util;
+import seiko.neiko.utils.EncryptUtil;
 import seiko.neiko.utils.FileUtil;
 
 /**
  * Created by Seiko on 2016/11/9. YiKu
  */
 
-public class MainActivity extends ActivityBase implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.viewpager)
     ViewPager mviewpager;
@@ -66,8 +66,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
     public int getLayoutId() {return R.layout.activity_main;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initViews(Bundle bundle) {
         fragmentList = new ArrayList<>();
         fragmentList.add(new MainSiteDFragment());
         fragmentList.add(new MainLikeFragment());
@@ -94,9 +93,9 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
         mNav.setNavigationItemSelectedListener(this);
 
         if (forIntent(getIntent())) {
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null) {
-                bundle.clear();
+            Bundle bud = getIntent().getExtras();
+            if (bud != null) {
+                bud.clear();
             }
         }
     }
@@ -113,7 +112,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
                 openActivity(Download1Activity.class);
                 return true;
             case R.id.nav_sited:
-                openActivity(SitedActivity.class);
+                openActivity(SitedItemActivity.class);
                 return true;
             case R.id.nav_cache:
                 openActivity(CacheActivity.class);
@@ -187,7 +186,7 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
         if (scheme.equals("sited")) {
             if(!"data".equals(uri.getHost())) return false;
 
-            String webUrl = Base64Util.decode(uri.getQuery()).replace("sited://", "http://");
+            String webUrl =  EncryptUtil.b64_decode(uri.getQuery()).replace("sited://", "http://");
             if(!webUrl.contains(".sited")) return false;
 
             OkHttpProxy.get().url(webUrl).enqueue(new OkCallback<String>(new OkTextParser()) {
@@ -206,8 +205,13 @@ public class MainActivity extends ActivityBase implements NavigationView.OnNavig
         if (scheme.equals("file")) {
             try {
                 ContentResolver cr = this.getContentResolver();
-                String sited = FileUtil.toString(cr.openInputStream(uri));
-                new Handler().postDelayed(() -> addSource(sited), 500);  //读取太快，需要延迟处理
+                final String sited = FileUtil.toString(cr.openInputStream(uri));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        addSource(sited);
+                    }
+                }, 1000);  //读取太快，需要延迟处理
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();

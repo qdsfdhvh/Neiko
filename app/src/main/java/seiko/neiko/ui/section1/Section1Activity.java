@@ -9,9 +9,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -19,6 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import seiko.neiko.R;
 import seiko.neiko.glide.ImageLoader;
 import seiko.neiko.dao.db.DbApi;
@@ -27,9 +28,9 @@ import seiko.neiko.models.BookPage;
 import seiko.neiko.models.ViewSetModel;
 import seiko.neiko.rx.RxBus;
 import seiko.neiko.rx.RxEvent;
-import seiko.neiko.app.ActivityBase;
+import seiko.neiko.app.BaseActivity;
 import seiko.neiko.dao.mReceiver;
-import seiko.neiko.utils.EncryptUtil;
+import seiko.neiko.view.Section1View;
 
 import static seiko.neiko.ui.section1.Section1FragmentBase.bookUrl;
 import static seiko.neiko.ui.section1.Section1FragmentBase.dtype;
@@ -40,7 +41,7 @@ import static seiko.neiko.ui.section1.Section1FragmentBase.t;
  * Created by Seiko on 2016/12/22. Y
  */
 
-public class Section1Activity extends ActivityBase implements Section1View, mTouch.TouchListener {
+public class Section1Activity extends BaseActivity implements Section1View, mTouch.TouchListener {
 
     @BindView(R.id.section_indexs)
     TextView title;
@@ -60,7 +61,7 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     @Override
     protected void onResume() {
         super.onResume();
-        setImmersiveFullscreen(true); //全屏
+        setImmersiveFullscreen(); //全屏
         ImageLoader.getDefault().loadSave();
     }
 
@@ -68,15 +69,13 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     public int getLayoutId() {return R.layout.activity_section1;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void initViews(Bundle bundle) {
         switch (dtype) {
             case 4:
                 setFragment(new Section1FragmentS());
                 break;
             case 1:
-                viewSet = DbApi.getBookViewSet(EncryptUtil.md5(bookUrl));
+                viewSet = DbApi.getBookViewSet(bookUrl);
                 loadViewSet(viewSet);
                 break;
         }
@@ -132,23 +131,26 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     private String getUrl() {return bookPages.get(ct).getBook_url();}
 
     @Override
-    public void onScroll(RecyclerView recView, LinearLayoutManager llm) {
+    public void onScroll(RecyclerView recView, final LinearLayoutManager llm) {
         this.recView = recView;
-        RxRecyclerView.scrollEvents(recView).subscribe((RecyclerViewScrollEvent event) -> {
-            if (bookPages.size() == 0) return;
+        RxRecyclerView.scrollEvents(recView).subscribe(new Consumer<RecyclerViewScrollEvent>() {
+            @Override
+            public void accept(RecyclerViewScrollEvent recyclerViewScrollEvent) throws Exception {
+                if (bookPages.size() == 0) return;
 
-            id = llm.findFirstVisibleItemPosition();
-            if ( (id-oldpages) > getpages() - 1) {
-                oldpages += getpages();
-                ct += 1;
-            } else if ((id-oldpages) < 0) {
-                ct -= 1;
-                if (ct<0) ct=0;
-                oldpages -= getpages();  //数据不能及时传到
-            }
+                id = llm.findFirstVisibleItemPosition();
+                if ( (id-oldpages) > getpages() - 1) {
+                    oldpages += getpages();
+                    ct += 1;
+                } else if ((id-oldpages) < 0) {
+                    ct -= 1;
+                    if (ct<0) ct=0;
+                    oldpages -= getpages();  //数据不能及时传到
+                }
 
-            if (ct < bookPages.size()) {
-                setTitle(gettitle(), id - oldpages, getpages());
+                if (ct < bookPages.size()) {
+                    setTitle(gettitle(), id - oldpages, getpages());
+                }
             }
         });
 
@@ -172,7 +174,12 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     private GestureDetector gestureScanner;
     private void initDetector() {
         gestureScanner = new GestureDetector(this, new mTouch(this));
-        RxView.clicks(back).subscribe((Void aVoid) -> finish());
+        RxView.clicks(back).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -193,13 +200,14 @@ public class Section1Activity extends ActivityBase implements Section1View, mTou
     }
 
     @Override
-    public void setScroll(int move, int t) {
+    public void setScroll(int height, int move, int t) {
         switch (viewSet.view_model) {
             case 0:
                 recView.smoothScrollBy(0, move * t);
                 break;
             case 1:
-                recView.smoothScrollToPosition(id + t);
+//                recView.smoothScrollToPosition(id + t);
+                recView.smoothScrollBy(0, height * t);
                 break;
             case 2:
                 recView.smoothScrollToPosition(id - t);

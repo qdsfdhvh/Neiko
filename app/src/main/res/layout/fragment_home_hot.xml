@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<zlc.season.practicalrecyclerview.PracticalRecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recView_hot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/refresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <zlc.season.practicalrecyclerview.PracticalRecyclerView
-            android:id="@+id/recView_hot"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingStart="3dp"
-            android:paddingEnd="3dp"
-            android:paddingBottom="2dp"
-            android:clipToPadding="false"
-            tools:listitem="@layout/fragment_home_hot" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-</RelativeLayout>
+    android:layout_height="match_parent"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp"
+    android:paddingBottom="2dp"
+    android:clipToPadding="false"
+    tools:listitem="@layout/fragment_home_hot" />

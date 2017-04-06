@@ -11,7 +11,7 @@ import org.noear.sited.SdApi;
 import java.nio.charset.Charset;
 
 import seiko.neiko.R;
-import seiko.neiko.utils.Base64Util;
+import seiko.neiko.utils.EncryptUtil;
 
 /**
  * Created by yuety on 16/2/1. Y
@@ -70,7 +70,7 @@ public class DdApi extends SdApi {
 
         str = sb.toString();
         Log.d("DdApi", str.substring(0, 50));
-        str = Base64Util.decode(str);
+        str = EncryptUtil.b64_decode(str);
         Log.d("DdApi", str.substring(0, 50));
         key = key + "ro4w78Jx";
 
@@ -89,7 +89,7 @@ public class DdApi extends SdApi {
         str = new String(data, coder);
         Log.d("DdApi", str.substring(0, 50));
 
-        return Base64Util.decode(str);
+        return EncryptUtil.b64_decode(str);
     }
 
     public static String dtypeName(int dtype){

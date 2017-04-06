@@ -1,7 +1,6 @@
 package seiko.neiko.viewModels;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,19 +15,23 @@ import java.util.List;
 import seiko.neiko.models.Book;
 import seiko.neiko.dao.db.DbApi;
 import seiko.neiko.dao.engine.DdSource;
+import seiko.neiko.models.ImgUrlBean;
 import seiko.neiko.utils.EncryptUtil;
 
 /**
  * Created by Seiko on 2016/8/31.
  *
  */
+
 public class BookViewModel extends ViewModelBase implements ISdViewModel {
 
     public List<Book> sectionList;
+    public List<ImgUrlBean> list;
     public Book book;
 
     public BookViewModel(String source, String url, int dtype) {
         sectionList = new ArrayList<>();
+        list = new ArrayList<>();
         this._dtype = dtype;
         this.source = source;
 
@@ -40,10 +43,14 @@ public class BookViewModel extends ViewModelBase implements ISdViewModel {
         DbApi.logBID(source, bookKey, bookUrl);
     }
 
-    public  void clear() {
+    public void clear() {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
         if (sectionList == null) {
             sectionList = new ArrayList<>();
         }
+        list.clear();
         sectionList.clear();
         i = 0;
     }
@@ -77,23 +84,6 @@ public class BookViewModel extends ViewModelBase implements ISdViewModel {
         for (String json : jsons) {
             loadByJsonData(config, json);
         }
-
-        if (sectionList.size() == 0) {
-            String json = jsons[0];
-            JsonArray data2;
-            JsonElement element = new JsonParser().parse(json);
-            if (element.isJsonObject())  {
-                JsonElement element2 = element.getAsJsonObject().get("list");
-                if (element2 != null && element2.isJsonArray()) {
-                    data2 = element2.getAsJsonArray();
-                    for (JsonElement el:data2) {
-                        String url = getString(el.getAsJsonObject(),"url");
-                        sectionList.add(new Book("", url));
-                    }
-                }
-            }
-        }
-
     }
 
     private int i;
@@ -131,7 +121,11 @@ public class BookViewModel extends ViewModelBase implements ISdViewModel {
 
         } else if (element.isJsonArray()) {
             for (JsonElement el:element.getAsJsonArray()) {
-                sectionList.add(new Book("", el.getAsString(), i));
+//                sectionList.add(new Book("", el.getAsString(), i));
+                ImgUrlBean bean = new ImgUrlBean();
+                bean.setUrl(el.getAsString());
+                bean.setIndex(i);
+                list.add(bean);
                 i++;
             }
         }

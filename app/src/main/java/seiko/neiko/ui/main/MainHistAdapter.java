@@ -10,6 +10,7 @@ import zlc.season.practicalrecyclerview.AbstractAdapter;
  */
 
 class MainHistAdapter extends AbstractAdapter<Book, MainHistViewHolder> {
+
     @Override
     protected MainHistViewHolder onNewCreateViewHolder(ViewGroup parent, int viewType) {
         return new MainHistViewHolder(parent, this);
@@ -19,4 +20,5 @@ class MainHistAdapter extends AbstractAdapter<Book, MainHistViewHolder> {
     protected void onNewBindViewHolder(MainHistViewHolder holder, int position) {
         holder.setData(get(position));
     }
+
 }
